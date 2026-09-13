@@ -67,9 +67,11 @@ passport.use(new LocalStrategy(User.authenticate())); // Authenticates requests 
 passport.serializeUser(User.serializeUser()); // serialize user object into session.
 passport.deserializeUser(User.deserializeUser()); // deserialize user objects out of the session.
 
+// Each & Every request pass through this middleware first
 app.use((req, res, next) => {
     res.locals.success = req.flash("success"); // using flash message generated when listing created
     res.locals.error = req.flash("error"); // using flash message generated when listing created
+    res.locals.currUser = req.user;
     next();
 })
 

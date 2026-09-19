@@ -1,5 +1,5 @@
-const Listing = require("./models/listing");
-const Review = require("./models/review");
+const Listing = require("./models/listingSchema");
+const Review = require("./models/reviewSchema");
 const { listingSchema, reviewSchema } = require("./schema");
 const ExpressError = require("./utils/expressError");
 
@@ -7,7 +7,6 @@ const isLoggedIn = (req, res, next) => {
     // console.log(req.path, "..", req.originalUrl);
     if (!req.isAuthenticated()) {
         req.session.redirectUrl = req.originalUrl; // redirect URL or callback URL
-        console.log(req.session);
         req.flash("error", "Login to create listing!");
         return res.redirect("/login");
     }

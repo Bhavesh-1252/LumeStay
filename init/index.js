@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 const initData = require("./data.js")
-const Listing = require("../models/listing.js")
+const Listing = require("../models/listingSchema.js")
 
 const MONGODB_URI = "mongodb://localhost:27017/"
 async function connectdb() {

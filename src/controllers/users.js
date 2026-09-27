@@ -1,4 +1,4 @@
-const User = require("../models/userSchema");
+import User from "../models/userSchema.js"
 
 const getSignup = (req, res) => {
     res.render("users/signup.ejs");
@@ -46,7 +46,7 @@ const logoutUser = (req, res) => {
     })
 }
 
-module.exports = {
+export {
     getSignup,
     signupUser,
     getLogin,

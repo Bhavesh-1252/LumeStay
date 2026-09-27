@@ -1,6 +1,4 @@
-const mongoose = require("mongoose");
-const Listing = require("./listingSchema");
-const Schema = mongoose.Schema;
+import mongoose, { Schema } from "mongoose";
 
 const reviewSchema = new Schema({
     comment: String,
@@ -20,4 +18,5 @@ const reviewSchema = new Schema({
 });
 
 const Review = mongoose.model("Review", reviewSchema);
-module.exports = Review;
+
+export default Review;

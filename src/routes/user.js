@@ -1,9 +1,10 @@
-const express = require("express");
-const wrapAsync = require("../utils/wrapAsync");
+import express from "express"
+import passport from "passport"
+import { getLogin, getSignup, loginUser, logoutUser, signupUser } from "../controllers/users.js";
+import { wrapAsync } from "../utils/wrapAsync.js";
+import { isLoggedIn, saveRedirectUrl } from "../middleware.js";
+
 const router = express.Router();
-const passport = require("passport");
-const { isLoggedIn, saveRedirectUrl } = require("../middleware");
-const { getSignup, signupUser, getLogin, loginUser, logoutUser } = require("../controllers/users.js");
 
 router.route("/signup")
     .get(getSignup)
@@ -21,4 +22,4 @@ router.route("/login")
 
 router.get("/logout", isLoggedIn, logoutUser)
 
-module.exports = router;
+export default router;

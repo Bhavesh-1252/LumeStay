@@ -1,49 +1,39 @@
 // PACKAGES
-if (process.env.NODE_ENV !== "production")
-    require('dotenv').config();
-
-const express = require("express");
-const mongoose = require("mongoose");
-const path = require("path");
-const methodOverride = require("method-override");
-const ejsMate = require("ejs-mate");
-const session = require("express-session");
-const { MongoStore } = require('connect-mongo')
-const flash = require("connect-flash");
-const passport = require("passport");
-const LocalStrategy = require("passport-local");
+import express from "express"
+import path from "path"
+import {fileURLToPath} from "url"
+import methodOverride from "method-override"
+import ejsMate from "ejs-mate"
+import session from "express-session"
+import { MongoStore } from "connect-mongo"
+import flash from "connect-flash"
+import passport from "passport"
+import LocalStrategy from "passport-local";
+import config from "./config/config.js"
 
 // ROUTES
-const listingRouter = require("./routes/listing.js");
-const reviewRouter = require("./routes/review.js");
-const userRouter = require("./routes/user.js");
+import listingRouter from "./routes/listing.js"
+import reviewRouter from "./routes/review.js"
+import userRouter from "./routes/user.js"
 
-const User = require("./models/userSchema.js");
-const ExpressError = require("./utils/expressError.js")
+import User from "./models/userSchema.js"
+import ExpressError from "./utils/expressError.js"
+
 const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate)
-app.use(express.static(path.join(__dirname, "public")))
+app.use(express.static(path.join(__dirname, "../public")))
 
 // DATABASE CONNECTIONS
-const dbUrl = process.env.ATLAS_DB_URL
-const superSecret = process.env.SESSION_SECRET
 
-async function connectdb() {
-    try {
-        await mongoose.connect(`${dbUrl}lumestay`)
-        console.log("Database connected successfully");
-    }
-    catch (err) {
-        console.log("Error in database connection: ", err);
-    }
-}
-
-connectdb();
+const superSecret = config.SESSION_SECRET;
+const dbUrl = config.MONGODB_URI;
 
 const store = MongoStore.create({
 
@@ -89,16 +79,6 @@ app.use((req, res, next) => {
     next();
 })
 
-// app.get("/demouser", async(req, res) => {
-//     const fakeUser = new User({
-//         email: "student@gmail.com",
-//         username: "delta-student",
-//     });
-
-//    const registeredUser = await User.register(fakeUser, "helloworld");
-//    res.send(registeredUser);
-// })
-
 // Listings Routes
 app.use('/listings', listingRouter);
 
@@ -108,21 +88,6 @@ app.use('/listings/:id/reviews', reviewRouter);
 // User Routes
 app.use('/', userRouter);
 
-
-// app.get("/testlisting", async (req, res) => {
-
-//     let sampleListing = new Listing({
-//         title : "My New Villa",
-//         description: "By the beach",
-//         price: 1200,
-//         location : "Goa",
-//         country: "India"
-//     })
-
-//     // await sampleListing.save();
-//     res.send("tested");
-// })
-
 // Error handling
 app.all("/{*splat}", (req, res, next) => {
     next(new ExpressError(404, "Page Not Found"));
@@ -131,10 +96,6 @@ app.all("/{*splat}", (req, res, next) => {
 app.use((err, req, res, next) => {
     const { statusCode = 500, message = "Something went wrong!" } = err;
     res.status(statusCode).render("error.ejs", { err })
-    // res.status(statusCode).send(message)
 })
 
-// Server Instance
-app.listen(8080, () => {
-    console.log("Server is listening at port: 8080");
-})
+export default app;

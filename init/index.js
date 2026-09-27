@@ -1,11 +1,11 @@
-const mongoose = require("mongoose")
-const initData = require("./data.js")
-const Listing = require("../models/listingSchema.js")
+import Listing from "../src/models/listingSchema.js"
+import mongoose from "mongoose"
+import initData from "./data.js"
 
 const MONGODB_URI = "mongodb://localhost:27017/"
 async function connectdb() {
     try {
-        await mongoose.connect(`${MONGODB_URI}wanderlust`)
+        await mongoose.connect(`${MONGODB_URI}lumestay`)
         console.log("Database connected successfully");
     }
     catch (err) {

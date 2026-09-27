@@ -1,6 +1,6 @@
 import express from "express"
 import passport from "passport"
-import { getLogin, getSignup, loginUser, logoutUser, signupUser } from "../controllers/users.js";
+import { getLogin, getSignup, loginUser, logoutUser, signupUser, verifyToken } from "../controllers/users.js";
 import { wrapAsync } from "../utils/wrapAsync.js";
 import { isLoggedIn, saveRedirectUrl } from "../middleware.js";
 
@@ -21,5 +21,7 @@ router.route("/login")
         wrapAsync(loginUser))
 
 router.get("/logout", isLoggedIn, logoutUser)
+
+router.get("/verify/:token", verifyToken);
 
 export default router;

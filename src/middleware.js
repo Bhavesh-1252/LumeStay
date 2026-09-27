@@ -5,7 +5,6 @@ import { listingSchema, reviewSchema } from "./schema.js";
 import ExpressError from "./utils/expressError.js";
 
 const isLoggedIn = (req, res, next) => {
-    // console.log(req.path, "..", req.originalUrl);
     if (!req.isAuthenticated()) {
         req.session.redirectUrl = req.originalUrl; // redirect URL or callback URL
         req.flash("error", "Login to create listing!");

@@ -10,6 +10,7 @@ import flash from "connect-flash"
 import passport from "passport"
 import LocalStrategy from "passport-local";
 import config from "./config/config.js"
+import verifyEmail from "./services/email.js"
 
 // ROUTES
 import listingRouter from "./routes/listing.js"

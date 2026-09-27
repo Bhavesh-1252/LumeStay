@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport({
 
 transporter.verify((err) => {
     if (err) {
-        throw new Error("Error connecting to email server:", err);
+        throw new Error("Error connecting to email server:", err.message);
     }
 });
 
@@ -25,7 +25,6 @@ const __dirname = path.dirname(__filename);
 export default async function verifyEmail(toEmail, link) {
 
     const html = await ejs.renderFile(path.join(__dirname, "..", "views/templates/email.ejs"), { link })
-    console.log(link);
 
     const mainOptions = {
         from: `"LumeStay" <${config.SMTP_USER}>`, // sender address

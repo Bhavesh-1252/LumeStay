@@ -1,10 +1,10 @@
-const Listing = require("./models/listingSchema");
-const Review = require("./models/reviewSchema");
-const { listingSchema, reviewSchema } = require("./schema");
-const ExpressError = require("./utils/expressError");
+
+import Listing from "./models/listingSchema.js";
+import Review from "./models/reviewSchema.js";
+import { listingSchema, reviewSchema } from "./schema.js";
+import ExpressError from "./utils/expressError.js";
 
 const isLoggedIn = (req, res, next) => {
-    // console.log(req.path, "..", req.originalUrl);
     if (!req.isAuthenticated()) {
         req.session.redirectUrl = req.originalUrl; // redirect URL or callback URL
         req.flash("error", "Login to create listing!");
@@ -34,7 +34,7 @@ const isOwner = async (req, res, next) => {
 }
 
 const isReviewAuthor = async (req, res, next) => {
-    const {id, reviewId } = req.params;
+    const { id, reviewId } = req.params;
     const review = await Review.findById(reviewId);
 
     if (!review.author._id.equals(res.locals.currUser._id)) {
@@ -69,4 +69,4 @@ const validateReview = (req, res, next) => {
         next();
 }
 
-module.exports = { isLoggedIn, saveRedirectUrl, isOwner, validateListing, validateReview, isReviewAuthor };
+export { isLoggedIn, saveRedirectUrl, isOwner, validateListing, validateReview, isReviewAuthor };

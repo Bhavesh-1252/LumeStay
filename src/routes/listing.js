@@ -1,13 +1,16 @@
-const express = require("express");
-const router = express.Router();
-const wrapAsync = require("../utils/wrapAsync");
-const { isLoggedIn, isOwner, validateListing } = require("../middleware");
-const { indexListing, newListing,
+import express from "express"
+import multer from "multer";
+import { storage } from "../services/cloudConfig.js";
+import { wrapAsync } from "../utils/wrapAsync.js";
+import { isLoggedIn, isOwner, validateListing } from "../middleware.js";
+import {
+    indexListing, newListing,
     createListing, showListing,
     editListing, updateListing,
-    destroyListing } = require("../controllers/listings");
-    const {storage} = require("../cloudConfig.js");
-const multer = require("multer");
+    destroyListing
+} from "../controllers/listings.js";
+
+const router = express.Router();
 const upload = multer({ storage }); // Cloudinary Destination to store file 
 
 router.route('/')
@@ -38,4 +41,4 @@ router.get("/:id/edit",
     isOwner,
     wrapAsync(editListing))
 
-module.exports = router;
+export default router;

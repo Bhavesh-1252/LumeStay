@@ -1,5 +1,5 @@
-const Listing = require("../models/listingSchema");
-const Review = require("../models/reviewSchema");
+import Listing from "../models/listingSchema.js"
+import Review from "../models/reviewSchema.js"
 
 const createReview = async (req, res) => {
     const { id } = req.params;
@@ -28,4 +28,4 @@ const destroyReview = async (req, res) => {
     res.redirect(`/listings/${id}`);
 }
 
-module.exports = {createReview, destroyReview}
+export {createReview, destroyReview};

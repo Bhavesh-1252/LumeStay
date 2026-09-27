@@ -1,4 +1,4 @@
-module.exports = (fn) => {
+export const wrapAsync = (fn) => {
     return (req, res, next) => {
         fn(req, res, next).catch(next); 
     }

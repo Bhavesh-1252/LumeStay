@@ -1,7 +1,9 @@
-const { default: mongoose } = require("mongoose");
-const Listing = require("../models/listingSchema");
-const { geocoding } = require('@maptiler/client')
-const {filters} = require("../utils/mock.js")
+import mongoose from "mongoose";
+import { geocoding } from "@maptiler/client";
+import { filters } from "../utils/mock.js";
+import Listing from "../models/listingSchema.js";
+
+
 
 const mapToken = process.env.MAP_TOKEN;
 
@@ -17,7 +19,7 @@ const newListing = (req, res) => {
 const showListing = async (req, res) => {
     const { id } = req.params;
 
-    if(!mongoose.Types.ObjectId.isValid(id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
         req.flash("error", "Invalid Listing Id!");
         return res.redirect("/listings")
     }
@@ -91,7 +93,7 @@ const destroyListing = async (req, res) => {
     res.redirect(`/listings`);
 }
 
-module.exports = {
+export {
     indexListing,
     newListing,
     showListing,
@@ -100,3 +102,4 @@ module.exports = {
     updateListing,
     destroyListing
 };
+

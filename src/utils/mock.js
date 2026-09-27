@@ -49,4 +49,4 @@ const filters = [
     },
 ]
 
-module.exports = {filters}
+export {filters}

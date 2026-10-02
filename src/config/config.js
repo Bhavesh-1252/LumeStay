@@ -26,24 +26,33 @@ if (!process.env.MAP_TOKEN) {
     throw new Error("Map token not found!")
 }
 
-if (!process.env.SMTP_USER) {
-    throw new Error("SMTP user not found!");
+if (!process.env.GOOGLE_EMAIL_USER) {
+    throw new Error("GOOGLE EMAIL USER not found!");
 }
 
-if (!process.env.SMTP_PASS) {
-    throw new Error("SMTP password not found!");
+if (!process.env.GOOGLE_CLIENT_ID) {
+    throw new Error("GOOGLE CLIENT ID not found!");
+}
+
+if (!process.env.GOOGLE_CLIENT_SECRET) {
+    throw new Error("GOOGLE CLIENT SECRET not found!");
+}
+
+if (!process.env.GOOGLE_REFRESH_TOKEN) {
+    throw new Error("GOOGLE REFRESH TOKEN not found!");
 }
 
 const config = {
     MONGODB_URI: process.env.MONGODB_URI,
     SESSION_SECRET: process.env.SESSION_SECRET,
     CLOUD_NAME: process.env.CLOUD_NAME,
-    CLOUD_NAME: process.env.CLOUD_NAME,
     CLOUD_API_KEY: process.env.CLOUD_API_KEY,
     CLOUD_API_SECRET: process.env.CLOUD_API_SECRET,
     MAP_TOKEN: process.env.MAP_TOKEN,
-    SMTP_USER: process.env.SMTP_USER,
-    SMTP_PASS: process.env.SMTP_PASS,
+    GOOGLE_EMAIL_USER: process.env.GOOGLE_EMAIL_USER,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    GOOGLE_REFRESH_TOKEN: process.env.GOOGLE_REFRESH_TOKEN,
 }
 
 export default config;

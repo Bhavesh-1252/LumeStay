@@ -3,7 +3,7 @@ const map = new maptilersdk.Map({
   container: 'map', // container's id or the HTML element to render the map
   style: maptilersdk.MapStyle.BASE,
   center: list.geometry.coordinates, // starting position [lng, lat]
-  zoom: 10, // starting zoom
+  zoom: 12, // starting zoom
 });
 
 const marker = new maptilersdk.Marker({color: "#ff0000"})

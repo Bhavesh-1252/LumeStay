@@ -3,8 +3,6 @@ import { geocoding } from "@maptiler/client";
 import { filters } from "../utils/mock.js";
 import Listing from "../models/listingSchema.js";
 
-
-
 const mapToken = process.env.MAP_TOKEN;
 
 const indexListing = async (req, res) => {
@@ -36,7 +34,8 @@ const showListing = async (req, res) => {
         req.flash("error", "Requested Listing Doesn't Exists!")
         return res.redirect("/listings");
     }
-    res.render("listings/show.ejs", { list, mapToken: mapToken });
+    
+    res.render("listings/show.ejs", { list, mapToken });
 }
 
 const createListing = async (req, res) => {

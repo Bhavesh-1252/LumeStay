@@ -34,10 +34,14 @@ const signupUser = async (req, res) => {
         registeredUser.verificationToken = token;
         registeredUser.save();
 
-        await verifyEmail(email, `${req.protocol}://${req.host}/verify/${token}`);
+        const err = await verifyEmail(email, `${req.protocol}://${req.host}/verify/${token}`);
+        if(err) {
+            req.flash("error", err);
+            return res.redirect("/signup");
+        }
 
-        req.flash("success", "Check you email to verify you account");
-        return res.redirect("/login");
+        req.flash("success", "Check your email to verify your account");
+        return res.redirect("/signup");
     } catch (error) {
         req.flash("error", error.message);
         return res.redirect("/signup");

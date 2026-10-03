@@ -6,14 +6,17 @@ import { fileURLToPath } from "url"
 import config from "../config/config.js";
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    type: 'OAuth2',
-    user: config.GOOGLE_EMAIL_USER,
-    clientId: config.GOOGLE_CLIENT_ID,
-    clientSecret: config.GOOGLE_CLIENT_SECRET,
-    refreshToken: config.GOOGLE_REFRESH_TOKEN,
-  },
+    service: 'gmail',
+    auth: {
+        type: 'OAuth2',
+        user: config.GOOGLE_EMAIL_USER,
+        clientId: config.GOOGLE_CLIENT_ID,
+        clientSecret: config.GOOGLE_CLIENT_SECRET,
+        refreshToken: config.GOOGLE_REFRESH_TOKEN,
+    },
+    tls: {
+        rejectUnauthorized: false,
+    }
 });
 
 transporter.verify((err) => {

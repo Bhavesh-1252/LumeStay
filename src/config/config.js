@@ -30,16 +30,8 @@ if (!process.env.GOOGLE_EMAIL_USER) {
     throw new Error("GOOGLE EMAIL USER not found!");
 }
 
-if (!process.env.GOOGLE_CLIENT_ID) {
-    throw new Error("GOOGLE CLIENT ID not found!");
-}
-
-if (!process.env.GOOGLE_CLIENT_SECRET) {
-    throw new Error("GOOGLE CLIENT SECRET not found!");
-}
-
-if (!process.env.GOOGLE_REFRESH_TOKEN) {
-    throw new Error("GOOGLE REFRESH TOKEN not found!");
+if (!process.env.BREVO_API_KEY) {
+    throw new Error("BREVO API KEY not found!");
 }
 
 const config = {
@@ -49,10 +41,8 @@ const config = {
     CLOUD_API_KEY: process.env.CLOUD_API_KEY,
     CLOUD_API_SECRET: process.env.CLOUD_API_SECRET,
     MAP_TOKEN: process.env.MAP_TOKEN,
-    GOOGLE_EMAIL_USER: process.env.GOOGLE_EMAIL_USER,
-    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
-    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
-    GOOGLE_REFRESH_TOKEN: process.env.GOOGLE_REFRESH_TOKEN,
+    GOOGLE_EMAIL_USER:process.env.GOOGLE_EMAIL_USER,
+    BREVO_API_KEY: process.env.BREVO_API_KEY,
 }
 
 export default config;

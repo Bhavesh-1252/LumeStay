@@ -1,34 +1,61 @@
 import { useContext } from "react";
 import { AuthContext } from "../auth.context";
-import { login, logout, register } from "../services/auth.api";
+import { getMe, login, logout, register } from "../services/auth.api";
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
-    const { user, setUser, loading, setLoading } = context;
+    const { user, setUser, loading, setLoading, authLoading, setAuthLoading } = context;
 
-    const handleLogin = async ({ email = "", username = "", password }) => {
+    const handleLogin = async (identifier, password) => {
         setLoading(true);
-        const data = await login(email, username, password);
+        try {
+            const data = await login(identifier, password);
+            localStorage.setItem("accessToken", data.accessToken);
+            setUser(data.user);
 
-        setUser(data.user);
-        setLoading(false);
+        } catch (error) {
+
+        } finally {
+            setLoading(false);
+        }
+
     }
 
-    const handleRegister = async ({ email, username, password }) => {
+    const handleRegister = async (email, username, password) => {
         setLoading(true);
-        const data = await register(email, username, password);
+        try {
+            const data = await register(email, username, password);
+            setUser(data.user);
+        } catch (error) {
 
-        setUser(data.user);
-        setLoading(false);
+        } finally {
+            setLoading(false);
+        }
     }
 
     const handleLogout = async () => {
         setLoading(true);
-        const data = await logout();
+        try {
+            await logout();
+            setUser(null);
+        } catch (error) {
 
-        setUser(null);
-        setLoading(false);
+        } finally {
+            setLoading(false);
+        }
     }
 
-    return { user, loading, handleRegister, handleLogin, handleLogout };
+    const handleGetme = async () => {
+        setLoading(true);
+        try {
+            await getMe();
+
+        } catch (error) {
+
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    return { user, loading, authLoading, handleRegister, handleLogin, handleLogout };
 }

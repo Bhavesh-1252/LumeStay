@@ -130,9 +130,9 @@ const verifyUserController = async (req, res) => {
 const loginUserController = async (req, res) => {
 
     try {
-        const { email, username, password } = req.body;
+        const { identifier, password } = req.body;
 
-        if ((!email && !username) || !password) {
+        if (!identifier || !password) {
             return res.status(400).json({
                 message: "All fields are required",
             })
@@ -140,8 +140,8 @@ const loginUserController = async (req, res) => {
 
         const user = await UserModel.findOne({
             $or: [
-                { username },
-                { email }
+                { username: identifier },
+                { email: identifier }
             ]
         })
 

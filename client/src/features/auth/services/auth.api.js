@@ -7,7 +7,7 @@ const api = axios.create({
     withCredentials: true,
 })
 
-export async function register({ username, email, password }) {
+export async function register( username, email, password ) {
     try {
         const response = await api.post(`/api/auth/register`, {
             username, email, password
@@ -20,10 +20,10 @@ export async function register({ username, email, password }) {
     }
 }
 
-export async function login({ email, username, password }) {
+export async function login( identifier, password ) {
     try {
         const response = await api.post(`/api/auth/login`, {
-            username, email, password
+            identifier, password
         });
 
         return response.data;
@@ -66,7 +66,7 @@ export async function rotateTokens() {
     }
 }
 
-export async function getMe() {
+export async function getMe(accessToken) {
     try {
         const response = await api.get(`/api/auth/get-me`, {
             headers: {

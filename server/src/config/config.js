@@ -6,29 +6,29 @@ if (!process.env.MONGODB_URI) {
     throw new Error("MONGODB URI not found!");
 }
 
-if (!process.env.SESSION_SECRET) {
-    throw new Error("Secret not found!");
-}
+// if (!process.env.SESSION_SECRET) {
+//     throw new Error("Secret not found!");
+// }
 
 if (!process.env.JWT_SECRET) {
-    throw new Error("SECRET not found!");
+    throw new Error("JWT SECRET not found!");
 }
 
-if (!process.env.CLOUD_NAME) {
-    throw new Error("Cloudinary folder not found!")
-}
+// if (!process.env.CLOUD_NAME) {
+//     throw new Error("Cloudinary folder not found!")
+// }
 
-if (!process.env.CLOUD_API_KEY) {
-    throw new Error("Cloudinary key not found!")
-}
+// if (!process.env.CLOUD_API_KEY) {
+//     throw new Error("Cloudinary key not found!")
+// }
 
-if (!process.env.CLOUD_API_SECRET) {
-    throw new Error("Cloudinary secret not found!")
-}
+// if (!process.env.CLOUD_API_SECRET) {
+//     throw new Error("Cloudinary secret not found!")
+// }
 
-if (!process.env.MAP_TOKEN) {
-    throw new Error("Map token not found!")
-}
+// if (!process.env.MAP_TOKEN) {
+//     throw new Error("Map token not found!")
+// }
 
 if (!process.env.GOOGLE_EMAIL_USER) {
     throw new Error("GOOGLE EMAIL USER not found!");

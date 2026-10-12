@@ -10,6 +10,7 @@ import flash from "connect-flash"
 import passport from "passport"
 import LocalStrategy from "passport-local";
 import config from "./config/config.js"
+import cors from "cors"
 import cookieParser from "cookie-parser"
 
 // ROUTES
@@ -33,39 +34,43 @@ app.set("view engine", "ejs");
 */
 app.use(express.json())
 app.use(cookieParser())
+app.use(express.static(path.join(__dirname, "../public")))
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+}))
 // app.use(methodOverride("_method"));
 // app.engine("ejs", ejsMate)
-app.use(express.static(path.join(__dirname, "../public")))
 
 // DATABASE CONNECTIONS
 
 const superSecret = config.SESSION_SECRET;
 const dbUrl = config.MONGODB_URI;
 
-const store = MongoStore.create({
+// const store = MongoStore.create({
 
-    mongoUrl: `${dbUrl}lumestay`,
-    crypto: {
-        secret: superSecret,
-    },
-    touchAfter: 24 * 3600,
-})
+//     mongoUrl: `${dbUrl}lumestay`,
+//     crypto: {
+//         secret: superSecret,
+//     },
+//     touchAfter: 24 * 3600,
+// })
 
-store.on("error", (err) => {
-    console.log("ERROR IN MONGO SESSION STORE: ", err);
-});
+// store.on("error", (err) => {
+//     console.log("ERROR IN MONGO SESSION STORE: ", err);
+// });
 
-const sessionOptions = {
-    secret: superSecret,
-    store,
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-        expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-    }
-}
+// const sessionOptions = {
+//     secret: superSecret,
+//     store,
+//     resave: false,
+//     saveUninitialized: true,
+//     cookie: {
+//         expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+//         maxAge: 7 * 24 * 60 * 60 * 1000,
+//         httpOnly: true,
+//     }
+// }
 
 // app.use(session(sessionOptions)) // Create session with sessionOptions
 // app.use(flash())

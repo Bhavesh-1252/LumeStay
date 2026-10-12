@@ -1,23 +1,23 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useAuth } from "../hooks/useAuth";
+import { LuLoader } from "react-icons/lu";
 
 const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-  });
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { loading, handleRegister } = useAuth();
+  const navigate = useNavigate()
 
-  const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    await handleRegister(username, email, password);
 
-    
-  };
+    navigate('/login');
+
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-8">
@@ -52,9 +52,9 @@ const RegisterForm = () => {
               <input
                 id="username"
                 type="text"
-                onChange={handleChange}
+                onChange={(e) => setUsername(e.target.value)}
                 name="username"
-                value={formData.username}
+                value={username}
                 placeholder="Enter your username"
                 className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-[#FF385C] focus:ring-2 focus:ring-[#FF385C]/20"
               />
@@ -70,9 +70,9 @@ const RegisterForm = () => {
               <input
                 id="email"
                 type="email"
-                onChange={handleChange}
+                onChange={(e) => setEmail(e.target.value)}
                 name="email"
-                value={formData.email}
+                value={email}
                 placeholder="Enter your email"
                 className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-[#FF385C] focus:ring-2 focus:ring-[#FF385C]/20"
               />
@@ -89,9 +89,9 @@ const RegisterForm = () => {
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  onChange={handleChange}
+                  onChange={(e) => setPassword(e.target.value)}
                   name="password"
-                  value={formData.password}
+                  value={password}
                   placeholder="Create a password"
                   className="w-full rounded-xl border border-gray-300 px-4 py-3 pr-20 text-sm outline-none transition focus:border-[#FF385C] focus:ring-2 focus:ring-[#FF385C]/20"
                 />
@@ -111,9 +111,13 @@ const RegisterForm = () => {
             {/* Signup Button */}
             <button
               type="submit"
-              className="w-full rounded-xl cursor-pointer bg-[#FF385C] py-3.5 text-sm font-semibold text-white transition hover:bg-[#E31C5F] active:scale-[0.99]"
+              className="w-full flex justify-center items-center gap-2 rounded-xl cursor-pointer bg-[#FF385C] py-3.5 text-sm font-semibold text-white transition hover:bg-[#E31C5F] active:scale-[0.99]"
             >
-              Create account
+              {!loading ?
+                "Create account" :
+                <>
+                <LuLoader className="w-5 h-5 animate-spin "/> Loading
+                </>}
             </button>
           </form>
           {/* Divider */}
@@ -154,7 +158,7 @@ const RegisterForm = () => {
               to="/login"
               className="font-semibold text-[#FF385C] hover:underline"
             >
-             {" "} Log in
+              {" "} Log in
             </Link>
           </p>
         </div>

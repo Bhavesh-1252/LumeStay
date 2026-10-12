@@ -1,8 +1,26 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useAuth } from "../hooks/useAuth";
+import { LuLoader } from "react-icons/lu";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
+  const { user, loading, handleLogin } = useAuth()
+
+  const navigate = useNavigate();
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log(user)
+
+    await handleLogin(identifier, password);
+
+    navigate('/');
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
@@ -21,19 +39,22 @@ const LoginForm = () => {
           <p className="mt-2 text-sm text-gray-500">
             Enter your details to continue
           </p>
-          <form className="mt-7 space-y-5">
+          <form onSubmit={handleSubmit} className="mt-7 space-y-5">
             {/* Email */}
             <div>
               <label
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Email
+                Email or Username
               </label>
               <input
                 id="email"
-                type="email"
-                placeholder="Enter your email"
+                type="text"
+                name="identifier"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                placeholder="Enter your email or username"
                 className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-[#FF385C] focus:ring-2 focus:ring-[#FF385C]/20"
               />
             </div>
@@ -57,6 +78,9 @@ const LoginForm = () => {
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   className="w-full rounded-xl border border-gray-300 px-4 py-3 pr-20 text-sm outline-none transition focus:border-[#FF385C] focus:ring-2 focus:ring-[#FF385C]/20"
                 />
@@ -72,9 +96,13 @@ const LoginForm = () => {
             {/* Login Button */}
             <button
               type="submit"
-              className="w-full rounded-xl cursor-pointer bg-[#FF385C] py-3.5 text-sm font-semibold text-white transition hover:bg-[#E31C5F] active:scale-[0.99]"
+              className="w-full flex justify-center items-center gap-2 rounded-xl cursor-pointer bg-[#FF385C] py-3.5 text-sm font-semibold text-white transition hover:bg-[#E31C5F] active:scale-[0.99]"
             >
-              Log in
+              {!loading ?
+                "Log in" :
+                <>
+                  <LuLoader className="w-5 h-5 animate-spin " /> Loading
+                </>}
             </button>
           </form>
           {/* Divider */}

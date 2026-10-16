@@ -7,7 +7,7 @@ const authRouter = express.Router();
 
 authRouter.post("/register", authControllers.registerUserController)
 
-authRouter.post("/verify-email", authControllers.verifyUserController);
+authRouter.post("/verify", authControllers.verifyUserController);
 
 authRouter.post("/login", authControllers.loginUserController)
 

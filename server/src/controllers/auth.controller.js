@@ -19,6 +19,7 @@ const registerUserController = async (req, res) => {
 
         if (!username || !email || !password) {
             return res.status(400).json({
+                success: false,
                 message: "All fields are required",
             });
         }
@@ -32,6 +33,7 @@ const registerUserController = async (req, res) => {
 
         if (isUserExists) {
             return res.status(400).json({
+                success: false,
                 message: "Account already exists with this email or username!",
             });
         }
@@ -56,12 +58,14 @@ const registerUserController = async (req, res) => {
 
         if (err) {
             return res.status(500).json({
+                success: false,
                 message: err,
             })
         }
 
         return res.status(201).json({
-            message: "User Registered successfully. Check your email to verify your account",
+            success: true,
+            message: "Check your email to verify your account",
             user: {
                 username: user.username,
                 email: user.email,
@@ -70,6 +74,7 @@ const registerUserController = async (req, res) => {
         })
     } catch (error) {
         res.status(500).json({
+            success: false,
             message: error.message
         });
     }
@@ -86,6 +91,7 @@ const verifyUserController = async (req, res) => {
 
         if (!otp) {
             return res.status(400).json({
+                success: false,
                 message: "OTP is required"
             })
         }
@@ -98,6 +104,7 @@ const verifyUserController = async (req, res) => {
 
         if (!otpDoc) {
             return res.status(400).json({
+                success: false,
                 message: "Invalid OTP"
             })
         }
@@ -107,6 +114,7 @@ const verifyUserController = async (req, res) => {
         await OtpModel.deleteMany({ userId: otpDoc.userId });
 
         return res.status(200).json({
+            success: true,
             message: "User verified successfully",
             user: {
                 username: user.username,
@@ -116,6 +124,7 @@ const verifyUserController = async (req, res) => {
         })
     } catch (error) {
         return res.status(500).json({
+            success: false,
             message: error.message
         })
     }
@@ -134,6 +143,7 @@ const loginUserController = async (req, res) => {
 
         if (!identifier || !password) {
             return res.status(400).json({
+                success: false,
                 message: "All fields are required",
             })
         }
@@ -147,12 +157,14 @@ const loginUserController = async (req, res) => {
 
         if (!user) {
             return res.status(401).json({
+                success: false,
                 message: "Invalid login credentials"
             })
         }
 
         if (!user.verified) {
             return res.status(401).json({
+                success: false,
                 message: "Email is not verified"
             })
         }
@@ -160,6 +172,7 @@ const loginUserController = async (req, res) => {
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             return res.status(401).json({
+                success: false,
                 message: "Invalid login credentials"
             })
         }
@@ -193,6 +206,7 @@ const loginUserController = async (req, res) => {
         });
 
         return res.status(201).json({
+            success: true,
             message: "User logged in successfully",
             user: {
                 username: user.username,
@@ -202,6 +216,7 @@ const loginUserController = async (req, res) => {
         })
     } catch (error) {
         return res.status(500).json({
+            success: false,
             message: error.message
         })
     }
@@ -218,6 +233,7 @@ const logoutUserController = async (req, res) => {
 
         if (!refreshToken) {
             return res.status(404).json({
+                success: false,
                 message: "Refresh token not found"
             });
         }
@@ -230,6 +246,7 @@ const logoutUserController = async (req, res) => {
 
         if (!session) {
             return res.status(400).json({
+                success: false,
                 message: "Invalid refresh token"
             })
         }
@@ -241,10 +258,12 @@ const logoutUserController = async (req, res) => {
         res.clearCookie("refreshToken");
 
         res.status(200).json({
+            success: true,
             message: "Logged out successfully",
         })
     } catch (error) {
         res.status(500).json({
+            success: false,
             message: error.message
         })
     }
@@ -262,6 +281,7 @@ const logoutAllUserController = async (req, res) => {
 
         if (!refreshToken) {
             return res.status(401).json({
+                success: false,
                 message: "Refresh Token not found"
             })
         }
@@ -276,10 +296,12 @@ const logoutAllUserController = async (req, res) => {
         res.clearCookie("refreshToken");
 
         res.status(200).json({
+            success: true,
             message: "Logged out from all devices"
         });
     } catch (error) {
         res.status(500).json({
+            success: false,
             message: error.message
         })
     }
@@ -296,6 +318,7 @@ const getMe = async (req, res) => {
 
         if (!token) {
             return res.status(401).json({
+                success: false,
                 message: "Token not provided!"
             })
         }
@@ -305,6 +328,7 @@ const getMe = async (req, res) => {
         const user = await UserModel.findById(decoded.id);
 
         res.status(200).json({
+            success: true,
             message: "User fetched successfully",
             user: {
                 username: user.username,
@@ -313,8 +337,16 @@ const getMe = async (req, res) => {
         })
 
     } catch (error) {
+        if(error.name === "TokenExpiredError"){
+            return res.status(401).json({
+                success: false,
+                message: error.message || "Invalid access Token"
+            })
+        }
+
         res.status(500).json({
-            message: error.message
+            success: false,
+            message: "Internal Server Error"
         })
     }
 }
@@ -330,6 +362,7 @@ const rotateToken = async (req, res) => {
 
         if (!refreshToken) {
             return res.status(401).json({
+                success: false,
                 message: "Refresh Token not found!"
             })
         }
@@ -344,7 +377,8 @@ const rotateToken = async (req, res) => {
         })
 
         if (!session) {
-            return res.status(400).json({
+            return res.status(401).json({
+                success: false,
                 message: "Invalid refresh token!"
             })
         }
@@ -373,12 +407,14 @@ const rotateToken = async (req, res) => {
         });
 
         res.status(200).json({
+            success: true,
             message: "Access token refreshed successfully",
             accessToken,
         })
 
     } catch (error) {
         res.status(500).json({
+            success: false,
             message: error.message
         })
     }

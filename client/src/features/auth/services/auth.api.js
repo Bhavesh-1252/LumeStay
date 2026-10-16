@@ -7,30 +7,29 @@ const api = axios.create({
     withCredentials: true,
 })
 
-export async function register( username, email, password ) {
-    try {
-        const response = await api.post(`/api/auth/register`, {
-            username, email, password
-        })
+export async function register(username, email, password) {
+    const response = await api.post(`/api/auth/register`, {
+        username, email, password
+    });
 
-        return response.data;
-    }
-    catch (error) {
-        console.log(error)
-    }
+    return response.data;
 }
 
-export async function login( identifier, password ) {
-    try {
-        const response = await api.post(`/api/auth/login`, {
-            identifier, password
-        });
+export async function verifyEmail(email, otp) {
+    const response = await api.post(`/api/auth/verify`, {
+        email, otp
+    });
 
-        return response.data;
-    }
-    catch (error) {
-        console.log(error);
-    }
+    return response.data;
+}
+
+export async function login(identifier, password) {
+    const response = await api.post(`/api/auth/login`, {
+        identifier, password
+    });
+
+    return response.data;
+
 }
 
 export async function logout() {
@@ -56,27 +55,16 @@ export async function logoutAll() {
 }
 
 export async function rotateTokens() {
-    try {
-        const response = await api.post(`/api/auth/rotate-token`)
-
-        return response.data;
-    }
-    catch (error) {
-        console.log(error);
-    }
+    const response = await api.post(`/api/auth/rotate-token`)
+    return response.data;
 }
 
 export async function getMe(accessToken) {
-    try {
-        const response = await api.get(`/api/auth/get-me`, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`
-            }
-        })
+    const response = await api.get(`/api/auth/get-me`, {
+        headers: {
+            Authorization: `Bearer ${accessToken}`
+        }
+    })
 
-        return response.data;
-    }
-    catch (error) {
-        console.log(error);
-    }
+    return response.data;
 }

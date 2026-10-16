@@ -2,22 +2,37 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../hooks/useAuth";
 import { LuLoader } from "react-icons/lu";
+import { useFlashMessage } from "../../../context/FlashMessage.context";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
-  const { user, loading, handleLogin } = useAuth()
+  const { showFlash } = useFlashMessage()
 
+  const { user, loading, handleLogin } = useAuth();
   const navigate = useNavigate();
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(user)
+    if (!identifier) {
+      setError("Email or username is required!")
+      return;
+    }
+    if (!password) {
+      setError("Password is required!")
+      return;
+    }
 
-    await handleLogin(identifier, password);
+    const response = await handleLogin(identifier, password);
 
+    if (!response.success) {
+      showFlash(response.message, "error")
+      return;
+    }
+
+    showFlash(response.message, "success");
     navigate('/');
   }
 
@@ -33,13 +48,15 @@ const LoginForm = () => {
             Welcome back to your next stay
           </p>
         </div>
+
         {/* Login Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
           <h2 className="text-2xl font-semibold text-gray-900">Log in</h2>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="my-2 text-sm text-gray-500">
             Enter your details to continue
           </p>
-          <form onSubmit={handleSubmit} className="mt-7 space-y-5">
+
+          <form onSubmit={handleSubmit} className="mt-5 space-y-5">
             {/* Email */}
             <div>
               <label
@@ -96,6 +113,7 @@ const LoginForm = () => {
             {/* Login Button */}
             <button
               type="submit"
+              disabled={loading}
               className="w-full flex justify-center items-center gap-2 rounded-xl cursor-pointer bg-[#FF385C] py-3.5 text-sm font-semibold text-white transition hover:bg-[#E31C5F] active:scale-[0.99]"
             >
               {!loading ?
@@ -148,10 +166,6 @@ const LoginForm = () => {
             </Link>
           </p>
         </div>
-        {/* Footer */}
-        <p className="mt-6 text-center text-xs text-gray-400">
-          By continuing, you agree to Lumestay's Terms and Privacy Policy.
-        </p>
       </div>
     </div>
   );

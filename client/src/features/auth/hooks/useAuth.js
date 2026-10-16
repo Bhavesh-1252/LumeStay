@@ -1,35 +1,65 @@
 import { useContext } from "react";
-import { AuthContext } from "../auth.context";
-import { getMe, login, logout, register } from "../services/auth.api";
+import { AuthContext } from "../auth.context.jsx";
+import { getMe, login, logout, register, verifyEmail } from "../services/auth.api";
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
     const { user, setUser, loading, setLoading, authLoading, setAuthLoading } = context;
 
     const handleLogin = async (identifier, password) => {
-        setLoading(true);
         try {
             const data = await login(identifier, password);
             localStorage.setItem("accessToken", data.accessToken);
             setUser(data.user);
 
+            return { success: true, message: data.message };
+
         } catch (error) {
-
-        } finally {
-            setLoading(false);
+            return {
+                success: false,
+                message: error.response?.data?.message ||
+                    error.message ||
+                    "Unable to login"
+            }
         }
-
     }
 
     const handleRegister = async (email, username, password) => {
-        setLoading(true);
         try {
             const data = await register(email, username, password);
-            setUser(data.user);
-        } catch (error) {
 
-        } finally {
-            setLoading(false);
+            if (!data.success) {
+                throw new Error(data.message || "Signup failed!")
+            }
+
+            return {
+                success: true,
+                message: data.message
+            }
+
+        } catch (error) {
+            return {
+                success: false,
+                message: error.response?.data?.message ||
+                    error.message ||
+                    "Unable to signup"
+            }
+        }
+    }
+
+    const handleVerifyEmail = async (email, otp) => {
+        try {
+            const data = await verifyEmail(email, otp);
+
+            return { success: true, message: data.message };
+
+        } catch (error) {
+            return {
+                success: false,
+                message: error.response?.data?.message ||
+                    error.message ||
+                    "Error in email verification!"
+            }
         }
     }
 
@@ -45,17 +75,25 @@ export const useAuth = () => {
         }
     }
 
-    const handleGetme = async () => {
-        setLoading(true);
-        try {
-            await getMe();
+    // const handleGetme = async () => {
+    //     setLoading(true);
+    //     try {
+    //         const accessToken = localStorage.getItem("accessToken");
+    //         if (!accessToken) {
+    //             setUser(null);
+    //             return;
+    //         }
 
-        } catch (error) {
+    //         const data = await getMe(accessToken);
+    //         setUser(data.user);
 
-        } finally {
-            setLoading(false);
-        }
-    }
+    //     } catch (error) {
+    //         setUser(null);
+    //         console.log("Failed to get user: ", error.response?.data?.message || error.message);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // }
 
-    return { user, loading, authLoading, handleRegister, handleLogin, handleLogout };
+    return { user, loading, authLoading, handleRegister, handleVerifyEmail, handleLogin, handleLogout };
 }

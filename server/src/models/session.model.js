@@ -25,7 +25,7 @@ const sessionSchema = new Schema({
     revokedAt: {
         type: Date,
         default: null,
-        expires: 10
+        expires: 604800 // 7 days
     }
 },{timestamps: true})
 

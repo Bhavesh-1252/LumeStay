@@ -1,6 +1,7 @@
 import express from "express"
 
 import authControllers from "../controllers/auth.controller.js";
+import { forgotPasswordLimiter } from "../middleware.js";
 // import { guestOnly, isLoggedIn, saveRedirectUrl } from "../middleware.js";
 
 const authRouter = express.Router();
@@ -18,5 +19,7 @@ authRouter.post("/logout-all", authControllers.logoutAllUserController)
 authRouter.post("/rotate-token", authControllers.rotateToken)
 
 authRouter.get("/get-me", authControllers.getMe)
+
+authRouter.get("/forgot-password", forgotPasswordLimiter, authControllers.forgotPassword);
 
 export default authRouter;

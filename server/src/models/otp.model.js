@@ -13,8 +13,22 @@ const otpSchema = new Schema({
     otpHash: {
         type: String,
         required: [true, "OTP is required"]
+    },
+    purpose: {
+        type: String,
+        enum: ["email-verification", "password-reset"],
+        required: true,
+    },
+    attempts: {
+        type: Number,
+        default: 0,
+    },
+    expiresAt: {
+        type: Date,
+        default: Date.now,
+        expires: 600 // 10 minutes
     }
-}, {timestamps: true})
+}, { timestamps: true })
 
 const OtpModel = mongoose.model("Otp", otpSchema);
 export default OtpModel;

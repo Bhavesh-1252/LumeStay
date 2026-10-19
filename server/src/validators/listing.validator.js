@@ -8,7 +8,7 @@ export const listingSchema = Joi.object({
         location: Joi.string().required(),
         price: Joi.number().required().min(0),
         image: Joi.string().allow("", null),
-        country: Joi.string().required()
+        country: Joi.string().required(),
     }).required(),
 })
 

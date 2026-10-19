@@ -51,7 +51,8 @@ const registerUserController = async (req, res) => {
         await OtpModel.create({
             userId: user._id,
             email: user.email,
-            otpHash
+            otpHash,
+            purpose: "email-verification"
         })
 
         const err = await verifyEmail(email, otp);
@@ -99,7 +100,7 @@ const verifyUserController = async (req, res) => {
         const otpHash = crypto.createHash("sha256").update(otp).digest("hex");
 
         const otpDoc = await OtpModel.findOne({
-            otpHash, email
+            otpHash, email, purpose: "email-verification"
         })
 
         if (!otpDoc) {
@@ -111,7 +112,7 @@ const verifyUserController = async (req, res) => {
 
         const user = await UserModel.findByIdAndUpdate(otpDoc.userId, { verified: true }, { new: true });
 
-        await OtpModel.deleteMany({ userId: otpDoc.userId });
+        await OtpModel.deleteMany({ userId: otpDoc.userId, purpose: "email-verification" });
 
         return res.status(200).json({
             success: true,
@@ -337,7 +338,7 @@ const getMe = async (req, res) => {
         })
 
     } catch (error) {
-        if(error.name === "TokenExpiredError"){
+        if (error.name === "TokenExpiredError") {
             return res.status(401).json({
                 success: false,
                 message: error.message || "Invalid access Token"
@@ -420,6 +421,15 @@ const rotateToken = async (req, res) => {
     }
 }
 
+/**
+ * @name forgotPassword
+ * @description Rotate accessToken and refreshToken automatically when accessToken is expired, expects refreshToken in cookies
+ * @access Public 
+ */
+const forgotPassword = async (req, res) => {
+    
+}
+
 export default {
     registerUserController,
     verifyUserController,
@@ -428,4 +438,5 @@ export default {
     logoutAllUserController,
     getMe,
     rotateToken,
+    forgotPassword,
 }

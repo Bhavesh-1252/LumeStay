@@ -1,7 +1,54 @@
 import Listing from "./models/listing.model.js";
 import Review from "./models/review.model.js";
-import { listingSchema, reviewSchema } from "./schema.js";
+import { listingSchema, reviewSchema } from "./validators/listing.validator.js";
 import ExpressError from "./utils/expressError.js";
+import rateLimit from "express-rate-limit"
+import { forgotPasswordSchema } from "./validators/auth.validator.js";
+
+const createLimiter = ({ minutes, limit, message }) => rateLimit({
+    windowMs: minutes * 60 * 1000,
+    limit,
+    legacyHeaders: false,
+    standardHeaders: true,
+    handler: (req, res) => res.status(429).json({
+        success: false,
+        code: "RATE_LIMITED",
+        message
+    })
+})
+
+export const forgotPasswordLimiter = createLimiter({
+    minutes: 15,
+    limit: 5,
+    message: "Too many requests. Please try again in few minutes!"
+})
+
+export const otpCheckerLimiter = createLimiter({
+    minutes: 15,
+    limit: 10,
+    message: "Too many attempts. Please try again later!"
+})
+
+export const validateForgotPassword = (req, res, next) => {
+    const { error, value } = forgotPasswordSchema.validate(req.body, { abortEarly: false });
+
+    if (error) {
+        const fields = {};
+        error.details.map((d) => {
+            const key = d.path[0];
+            if (key && !fields[key]) fields[key] = d.message;
+        })
+
+        return res.status(422).json({
+            success: false,
+            message: error.details[0].message,
+            fields
+        })
+    }
+    req.body = value;
+    next();
+
+}
 
 export const guestOnly = (req, res, next) => {
     if (req.isAuthenticated()) {

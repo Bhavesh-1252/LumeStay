@@ -1,9 +1,8 @@
-import { createContext, useEffect, useState } from "react";
-import { getMe, rotateTokens } from "./services/auth.api";
+import { useEffect, useState } from "react";
+import AuthContext from "../contexts/auth.context";
+import { getMe, rotateTokens } from "../services/auth.api";
 
-export const AuthContext = createContext();
-
-export const AuthProvider = ({ children }) => {
+const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
@@ -11,18 +10,18 @@ export const AuthProvider = ({ children }) => {
   const handleRotateTokens = async () => {
     try {
       const data = await rotateTokens();
-      if (!data.success) {
-        throw new Error(data.message || "Session Expired!");
-      }
-
       localStorage.setItem("accessToken", data.accessToken);
 
       return { success: true, accessToken: data.accessToken };
     } catch (error) {
       localStorage.removeItem("accessToken");
-      return { success: false };
+      return {
+        success: false,
+        message:
+          error.response?.data?.message || error.message || "Session expired!",
+      };
     }
-  }
+  };
 
   // Initial load - getting user from accessToken
   // if accessToken is expired then rotating token with refreshToken
@@ -39,8 +38,8 @@ export const AuthProvider = ({ children }) => {
       try {
         const data = await getMe(accessToken);
         setUser(data.user);
-
-      } catch (error) { // If accessToken is invalid
+      } catch (error) {
+        // If accessToken is invalid
         if (error.response?.status !== 401) throw error;
 
         const result = await handleRotateTokens(); // rotating tokens
@@ -51,31 +50,37 @@ export const AuthProvider = ({ children }) => {
 
         const data = await getMe(result.accessToken);
         setUser(data.user);
-        console.log()
       }
     } catch (error) {
       setUser(null);
       console.log("Failed to get user:", error.message);
-    }
-    finally {
+    } finally {
       setAuthLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     const initialState = async () => {
       await handleGetme();
-    }
+    };
 
-    initialState()
-  }, [])
-
+    initialState();
+  }, []);
 
   return (
     <AuthContext.Provider
-      value={{ user, setUser, loading, setLoading, authLoading, setAuthLoading }}
+      value={{
+        user,
+        setUser,
+        loading,
+        setLoading,
+        authLoading,
+        setAuthLoading,
+      }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
+
+export default AuthProvider;

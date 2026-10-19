@@ -2,15 +2,15 @@ import { useState } from "react";
 import RegisterForm from "../components/RegisterForm";
 import OtpForm from "../components/OtpForm";
 
+
 const Register = () => {
-  const [step, setStep] = useState(2);
+  const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
 
   const handleRegistered = (registeredEmail) => {
     setEmail(registeredEmail);
     setStep(2);
   }
-
   // return <RegisterForm />;
 
   return (

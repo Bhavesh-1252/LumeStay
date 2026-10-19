@@ -38,7 +38,7 @@ const RegisterForm = ({ onSuccess }) => {
     e.preventDefault();
 
     const found = validate();
-    if (Object.keys(found).length) {
+    if (Object.keys(found).length) {  // Converts found object to array of object keys
       setErrors(found);
       return;
     }

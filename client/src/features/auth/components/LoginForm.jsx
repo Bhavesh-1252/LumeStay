@@ -2,39 +2,65 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../hooks/useAuth";
 import { LuLoader } from "react-icons/lu";
-import { useFlashMessage } from "../../../context/FlashMessage.context";
+import useFlashMessage from "../../../hooks/useFlashMessage";
+import FormField from "./FormField";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
-  const { showFlash } = useFlashMessage()
+  const [loading, setLoading] = useState();
+  const [errors, setErrors] = useState({});
+  const [formError, setFormError] = useState("");
 
-  const { user, loading, handleLogin } = useAuth();
+  const { handleLogin } = useAuth();
+  const { showFlash } = useFlashMessage();
   const navigate = useNavigate();
 
+  const validate = () => {
+    let e = {};
+    if (!identifier.trim()) e.identifier = "Email or username is required!";
+    else if (identifier.trim().length < 3)
+      e.identifier = "Username must be atleast 3 characters!";
+
+    if (!password) e.password = "Password is required!";
+    else if (password.length < 8)
+      e.password = "Password must be atleast 8 characters!";
+
+    return e;
+  };
+
+  const clearError = (field) => {
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
+    if (formError) setFormError("");
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!identifier) {
-      setError("Email or username is required!")
-      return;
-    }
-    if (!password) {
-      setError("Password is required!")
-      return;
-    }
 
-    const response = await handleLogin(identifier, password);
-
-    if (!response.success) {
-      showFlash(response.message, "error")
+    const found = validate();
+    if (Object.keys(found).length) {
+      setErrors(found);
       return;
     }
 
-    showFlash(response.message, "success");
-    navigate('/');
-  }
+    setLoading(true);
+    setFormError("");
+    try {
+      const response = await handleLogin(identifier, password);
+      if (!response.success) {
+        setFormError(response.message);
+        return;
+      }
+
+      showFlash(response.message, "success");
+      navigate("/", { replace: true });
+    } catch (error) {
+      setFormError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-8">
@@ -56,9 +82,17 @@ const LoginForm = () => {
             Enter your details to continue
           </p>
 
+          {formError && (
+            <div
+              className={`flex items-center gap-3 rounded-lg border mt-2 px-4 py-3 text-sm font-medium bg-red-100 text-red-800 border-red-300`}
+            >
+              {formError}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="mt-5 space-y-5">
             {/* Email */}
-            <div>
+            {/* <div>
               <label
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700 mb-2"
@@ -74,9 +108,21 @@ const LoginForm = () => {
                 placeholder="Enter your email or username"
                 className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-[#FF385C] focus:ring-2 focus:ring-[#FF385C]/20"
               />
-            </div>
+            </div> */}
+            <FormField
+              id="identifier"
+              type="text"
+              error={errors.identifier}
+              label="Email or username"
+              value={identifier}
+              placeholder="Enter your email or username"
+              onChange={(e) => {
+                setIdentifier(e.target.value);
+                clearError("identifier");
+              }}
+            />
             {/* Password */}
-            <div>
+            {/* <div>
               <div className="flex items-center justify-between mb-2">
                 <label
                   htmlFor="password"
@@ -109,18 +155,41 @@ const LoginForm = () => {
                   {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
-            </div>
+            </div> */}
+            <FormField
+              id="password"
+              label="Password"
+              error={errors.password}
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                clearError("password");
+              }}
+              placeholder="Enter your password"
+              rightSlot={
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="cursor-pointer absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-500 hover:text-gray-800"
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              }
+            />
             {/* Login Button */}
             <button
               type="submit"
               disabled={loading}
               className="w-full flex justify-center items-center gap-2 rounded-xl cursor-pointer bg-[#FF385C] py-3.5 text-sm font-semibold text-white transition hover:bg-[#E31C5F] active:scale-[0.99]"
             >
-              {!loading ?
-                "Log in" :
+              {!loading ? (
+                "Log in"
+              ) : (
                 <>
                   <LuLoader className="w-5 h-5 animate-spin " /> Loading
-                </>}
+                </>
+              )}
             </button>
           </form>
           {/* Divider */}

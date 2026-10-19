@@ -33,14 +33,8 @@ export async function login(identifier, password) {
 }
 
 export async function logout() {
-    try {
-        const response = await api.post(`/api/auth/logout`)
-
-        return response.data;
-    }
-    catch (error) {
-        console.log(error);
-    }
+    const response = await api.post(`/api/auth/logout`)
+    return response.data;
 }
 
 export async function logoutAll() {

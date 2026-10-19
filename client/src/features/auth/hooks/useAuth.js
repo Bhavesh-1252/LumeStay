@@ -1,10 +1,10 @@
 import { useContext } from "react";
-import { AuthContext } from "../auth.context.jsx";
-import { getMe, login, logout, register, verifyEmail } from "../services/auth.api";
+import AuthContext from "../contexts/auth.context.jsx";
+import { login, logout, register, verifyEmail } from "../services/auth.api";
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
-    const { user, setUser, loading, setLoading, authLoading, setAuthLoading } = context;
+    const { user, setUser, loading, authLoading } = context;
 
     const handleLogin = async (identifier, password) => {
         try {
@@ -27,11 +27,6 @@ export const useAuth = () => {
     const handleRegister = async (email, username, password) => {
         try {
             const data = await register(email, username, password);
-
-            if (!data.success) {
-                throw new Error(data.message || "Signup failed!")
-            }
-
             return {
                 success: true,
                 message: data.message
@@ -64,14 +59,20 @@ export const useAuth = () => {
     }
 
     const handleLogout = async () => {
-        setLoading(true);
         try {
-            await logout();
-            setUser(null);
+            const data = await logout();
+            return { success: true, message: data.message };
         } catch (error) {
-
-        } finally {
-            setLoading(false);
+            return {
+                success: false,
+                message: error.response?.data?.message ||
+                    error.message ||
+                    "Error in logout!"
+            }
+        }
+        finally {
+            setUser(null);
+            localStorage.removeItem("accessToken");
         }
     }
 

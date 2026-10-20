@@ -3,7 +3,7 @@ import Review from "./models/review.model.js";
 import { listingSchema, reviewSchema } from "./validators/listing.validator.js";
 import ExpressError from "./utils/expressError.js";
 import rateLimit from "express-rate-limit"
-import { forgotPasswordSchema } from "./validators/auth.validator.js";
+import { forgotPasswordSchema, loginSchema, registerSchema, verificationSchema } from "./validators/auth.validator.js";
 
 const createLimiter = ({ minutes, limit, message }) => rateLimit({
     windowMs: minutes * 60 * 1000,
@@ -29,6 +29,69 @@ export const otpCheckerLimiter = createLimiter({
     message: "Too many attempts. Please try again later!"
 })
 
+export const validateRegisteration = (req, res, next) => {
+    const { error, value } = registerSchema.validate(req.body, { abortEarly: false });
+
+    if (error) {
+        const fields = {};
+        error.details.map((d) => {
+            const key = d.path[0];
+            if (key && !fields[key]) fields[key] = d.message;
+        })
+
+        return res.status(422).json({
+            success: false,
+            message: error.details[0].message,
+            fields
+        })
+    }
+
+    req.body = value,
+        next();
+}
+
+export const validateVerification = (req, res, next) => {
+    const { error, value } = verificationSchema.validate(req.body, { abortEarly: false });
+
+    if (error) {
+        const fields = {};
+        error.details.map((d) => {
+            const key = d.path[0];
+            if (key && !fields[key]) fields[key] = d.message;
+        })
+
+        return res.status(422).json({
+            success: false,
+            message: error.details[0].message,
+            fields,
+        });
+    }
+
+    req.body = value;
+    next();
+}
+
+export const validateLogin = (req, res, next) => {
+    const { error, value } = loginSchema.validate(req.body, { abortEarly: false });
+
+    if (error) {
+        const fields = {};
+        error.details.map((d) => {
+            const key = d.path[0];
+            if (key && !fields[key]) fields[key] = d.message;
+        })
+
+        return res.status(422).json({
+            success: false,
+            message: error.details[0].message,
+            fields
+        })
+    }
+
+    req.body = value,
+        next();
+}
+
 export const validateForgotPassword = (req, res, next) => {
     const { error, value } = forgotPasswordSchema.validate(req.body, { abortEarly: false });
 
@@ -47,7 +110,6 @@ export const validateForgotPassword = (req, res, next) => {
     }
     req.body = value;
     next();
-
 }
 
 export const guestOnly = (req, res, next) => {

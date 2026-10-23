@@ -1,6 +1,6 @@
 import config from "../config/config.js";
 import UserModel from "../models/user.model.js"
-import verifyEmail from "../services/email.js";
+import { sendPasswordResetEmail, sendRegistrationEmail } from "../services/email.js"
 import bcrypt from "bcrypt"
 import crypto from "crypto"
 import jwt from "jsonwebtoken"
@@ -55,7 +55,7 @@ const registerUserController = async (req, res) => {
             purpose: "email-verification"
         })
 
-        const err = await verifyEmail(email, otp);
+        const err = await sendRegistrationEmail(email, otp);
 
         if (err) {
             return res.status(500).json({
@@ -89,13 +89,6 @@ const registerUserController = async (req, res) => {
 const verifyUserController = async (req, res) => {
     try {
         const { otp, email } = req.body;
-
-        if (!otp) {
-            return res.status(400).json({
-                success: false,
-                message: "OTP is required"
-            })
-        }
 
         const otpHash = crypto.createHash("sha256").update(otp).digest("hex");
 
@@ -423,11 +416,144 @@ const rotateToken = async (req, res) => {
 
 /**
  * @name forgotPassword
- * @description Rotate accessToken and refreshToken automatically when accessToken is expired, expects refreshToken in cookies
+ * @description Forget password - sends an OTP to the user, expects email in the body. 
  * @access Public 
  */
 const forgotPassword = async (req, res) => {
-    
+    try {
+        const { email } = req.body;
+
+        const user = await UserModel.findOne({ email });
+        if (!user) { // same response for both unknown and registered emails, to avoid showing user existence
+            return res.status(200).json({
+                success: true,
+                message: "If this email is registered, an OTP has been sent."
+            });
+        }
+
+        const otpDoc = await OtpModel.findOne({
+            userId: user._id,
+            purpose: "password-reset",
+        });
+
+        if (otpDoc && otpDoc.createdAt.getTime() + 60000 > Date.now()) {
+            return res.status(200).json({
+                success: true,
+                message: "If this email is registered, an OTP has been sent."
+            });
+        }
+
+        if (otpDoc) await OtpModel.deleteOne({ _id: otpDoc._id, purpose: "password-reset", });
+
+        const otp = crypto.randomInt(100000, 1000000).toString();
+        const hashedOtp = crypto.createHash("sha256").update(otp).digest("hex");
+        await OtpModel.create({
+            userId: user._id,
+            otpHash: hashedOtp,
+            email: user.email,
+            purpose: "password-reset"
+        });
+
+        const error = await sendPasswordResetEmail(user.email, otp);
+        if (error) {
+            return res.status(200).json({
+                success: true,
+                message: "If this email is registered, an OTP has been sent."
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "If this email is registered, an OTP has been sent."
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong, please try again later!",
+        })
+    }
+}
+
+/**
+ * @name verifyResetOtp
+ * @description Verify OTP for password reset - expects email and OTP in the body
+ * @access Public 
+ */
+const verifyResetOtp = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+
+        const user = await UserModel.findOne({ email });
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid OTP!"
+            })
+        }
+
+        const otpDoc = await OtpModel.findOne({
+            email: user.email,
+            purpose: "password-reset",
+        })
+
+        if (!otpDoc) {
+            return res.status(400).json({
+                success: false,
+                message: "OTP is expired!"
+            })
+        }
+
+        if (otpDoc.createdAt.getTime() + 60000 < Date.now()) {
+            await OtpModel.deleteOne({ _id: otpDoc._id });
+            return res.status(400).json({
+                success: false,
+                message: "OTP is expired!"
+            })
+        }
+
+        const updatedOtpDoc = await OtpModel.findOneAndUpdate(
+            { _id: otpDoc._id, attempts: { $lt: 5 } },
+            { $inc: { attempts: 1 } },
+            { new: true }
+        );
+
+        if (!updatedOtpDoc) {
+            await OtpModel.deleteOne({ _id: otpDoc._id });
+            return res.status(429).json({
+                success: false,
+                message: "OTP attempts exceeded!"
+            });
+        }
+
+        const hashedOtp = crypto.createHash("sha256").update(otp).digest("hex");
+        if (hashedOtp !== updatedOtpDoc.otpHash) {
+            if (updatedOtpDoc.attempts >= 5) { // 5 is MAX_ATTEMPTS
+                await OtpModel.deleteOne({ _id: updatedOtpDoc._id });
+                return res.status(429).json({
+                    success: false,
+                    message: "OTP attempts exceeded!"
+                });
+            }
+            return res.status(400).json({
+                success: false,
+                message: "Invalid OTP!",
+                attempts: 5 - updatedOtpDoc.attempts,
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "OTP verified successfully!",
+        });
+
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong, Please again later!"
+        })
+    }
 }
 
 export default {
@@ -439,4 +565,5 @@ export default {
     getMe,
     rotateToken,
     forgotPassword,
+    verifyResetOtp,
 }

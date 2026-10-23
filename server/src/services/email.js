@@ -8,9 +8,9 @@ const brevo = new BrevoClient({ apiKey: config.BREVO_API_KEY });
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export default async function verifyEmail(toEmail, otp) {
+export async function sendRegistrationEmail(toEmail, otp) {
 
-    const html = await ejs.renderFile(path.join(__dirname, "..", "views/templates/email.ejs"), { otp })
+    const html = await ejs.renderFile(path.join(__dirname, "..", "views/templates/userVerificationEmail.ejs"), { otp })
 
     try {
         await brevo.transactionalEmails.sendTransacEmail({
@@ -19,8 +19,24 @@ export default async function verifyEmail(toEmail, otp) {
             sender: { name: 'LumeStay', email: `${config.GOOGLE_EMAIL_USER}` },
             to: [{ email: toEmail }],
         });
-    } catch (err) {
-        console.error("Error while sending mail:", err);
-        throw new Error(err.body.message);
+    } catch (error) {
+        console.error("Error while sending user verification email:", error);
+        throw new Error(error.body.message);
+    }
+}
+
+export async function sendPasswordResetEmail(toEmail, otp) {
+    const html = await ejs.renderFile(path.join(__dirname, "..", "views/templates/passwordResetEmail.ejs"), { otp })
+
+    try {
+        await brevo.transactionalEmails.sendTransacEmail({
+            subject: "Reset your password",
+            htmlContent: html,
+            sender: { name: "LumeStay", email: `${config.GOOGLE_EMAIL_USER}` },
+            to: [{ email: toEmail }]
+        });
+    } catch (error) {
+        console.error("Error while sending password reset email", error)
+        throw new Error(error.body.message);
     }
 }

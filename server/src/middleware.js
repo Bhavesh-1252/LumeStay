@@ -3,7 +3,7 @@ import Review from "./models/review.model.js";
 import { listingSchema, reviewSchema } from "./validators/listing.validator.js";
 import ExpressError from "./utils/expressError.js";
 import rateLimit from "express-rate-limit"
-import { forgotPasswordSchema, loginSchema, registerSchema, verificationSchema } from "./validators/auth.validator.js";
+import { forgotPasswordSchema, loginSchema, registerSchema, verificationSchema, verifyResetOtpSchema } from "./validators/auth.validator.js";
 
 const createLimiter = ({ minutes, limit, message }) => rateLimit({
     windowMs: minutes * 60 * 1000,
@@ -46,7 +46,7 @@ export const validateRegisteration = (req, res, next) => {
         })
     }
 
-    req.body = value,
+    req.body = value;
         next();
 }
 
@@ -88,8 +88,8 @@ export const validateLogin = (req, res, next) => {
         })
     }
 
-    req.body = value,
-        next();
+    req.body = value;
+    next();
 }
 
 export const validateForgotPassword = (req, res, next) => {
@@ -108,6 +108,27 @@ export const validateForgotPassword = (req, res, next) => {
             fields
         })
     }
+    req.body = value;
+    next();
+}
+
+export const validateVerifyResetOtp = (req, res, next) => {
+    const { error, value } = verifyResetOtpSchema.validate(req.body, { abortEarly: false });
+
+    if (error) {
+        const fields = {};
+        error.details.map((d) => {
+            const key = d.path[0];
+            if (key && !fields[key]) fields[key] = d.message;
+        })
+
+        return res.status(422).json({
+            success: false,
+            message: error.details[0].message,
+            fields
+        })
+    }
+
     req.body = value;
     next();
 }

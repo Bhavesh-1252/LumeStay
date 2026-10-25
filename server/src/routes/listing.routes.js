@@ -2,7 +2,7 @@ import express from "express"
 import multer from "multer";
 import { storage } from "../services/cloudConfig.js";
 import { wrapAsync } from "../utils/wrapAsync.js";
-import { isLoggedIn, isOwner, validateListing } from "../middleware.js";
+import { isLoggedIn, isOwner, validateListing } from "../middlewares/middleware.js";
 import {
     indexListing, newListing,
     createListing, showListing,

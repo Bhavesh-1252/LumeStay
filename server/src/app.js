@@ -20,7 +20,7 @@ import authRouter from "./routes/auth.routes.js"
 
 import UserModel from "./models/user.model.js"
 import ExpressError from "./utils/expressError.js"
-import { isLoggedIn } from "./middleware.js";
+import { isLoggedIn } from "./middlewares/middleware.js";
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);

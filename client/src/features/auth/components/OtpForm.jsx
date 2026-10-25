@@ -1,20 +1,15 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LuLoader } from "react-icons/lu";
-import { useAuth } from "../hooks/useAuth";
-import useFlashMessage from "../../../hooks/useFlashMessage";
-import { useNavigate } from "react-router";
 
 const LENGTH = 6;
+const RESEND_SECONDS = 60;
 
-function OtpForm({ email, onBack }) {
+function OtpForm({ email, onBack, onVerify, onResend, title, submitLabel }) {
   const [digits, setDigits] = useState(Array(LENGTH).fill(""));
   const inputsRef = useRef([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const { handleVerifyEmail } = useAuth();
-  const { showFlash } = useFlashMessage();
-  const navigate = useNavigate();
+  const [coolDown, setCoolDown] = useState(RESEND_SECONDS);
 
   const focusAt = (i) => inputsRef.current[i]?.focus();
 
@@ -62,6 +57,16 @@ function OtpForm({ email, onBack }) {
     focusAt(Math.min(pasted.length, LENGTH - 1));
   };
 
+  // CoolDown Timer
+  useEffect(() => {
+    if (coolDown <= 0) return;
+    const t = setTimeout(() => {
+      setCoolDown(coolDown - 1);
+    }, 1000);
+
+    return () => clearTimeout(t);
+  }, [coolDown]);
+
   const code = digits.join("");
   const isComplete = code.length === LENGTH;
 
@@ -71,28 +76,37 @@ function OtpForm({ email, onBack }) {
     setLoading(true);
     setError("");
     try {
-      const response = await handleVerifyEmail(email, code);
+      const response = await onVerify(email, code);
       if (!response.success) {
+        setError(response.message);
+      }
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Yet Incomplete
+  const handleResend = async () => {
+    setError("");
+    setDigits(Array(LENGTH).fill(""));
+    focusAt(0);
+    try {
+      const response = await onResend();
+      if (response && !response.success) {
         setError(response.message);
         return;
       }
-
-      showFlash(response.message, "success");
-      navigate("/login");
-
+      setCoolDown(RESEND_SECONDS);
     } catch (error) {
-      setError(error.message);
-    }
-    finally{
-        setLoading(false);
+      setError(error.response?.data?.message || error.message);
     }
   };
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
-      <h2 className="text-2xl font-semibold text-gray-900">
-        Verify your email
-      </h2>
+      <h2 className="text-2xl font-semibold text-gray-900">{title}</h2>
       <p className="text-sm text-gray-500">
         Enter the 6-digit code we sent to{" "}
         <span className="font-medium text-gray-700">
@@ -136,7 +150,7 @@ function OtpForm({ email, onBack }) {
           className="w-full flex justify-center items-center gap-2 rounded-xl cursor-pointer bg-[#FF385C] py-3.5 text-sm font-semibold text-white transition hover:bg-[#E31C5F] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {!loading ? (
-            "Verify email"
+            submitLabel
           ) : (
             <>
               <LuLoader className="w-5 h-5 animate-spin" /> Verifying
@@ -150,10 +164,12 @@ function OtpForm({ email, onBack }) {
         Didn't get the code?{" "}
         <button
           type="button"
+          onClick={handleResend}
+          disabled={coolDown > 0}
           className="cursor-pointer font-semibold text-[#FF385C] hover:underline"
         >
           {" "}
-          Resend
+          {coolDown > 0 ? `Resend in ${coolDown}s` : "Resend"}
         </button>
       </p>
 
@@ -165,7 +181,8 @@ function OtpForm({ email, onBack }) {
           type="button"
           className="cursor-pointer font-semibold text-[#FF385C] hover:underline"
         >
-          {" "}Go back
+          {" "}
+          Go back
         </button>
       </p>
     </div>

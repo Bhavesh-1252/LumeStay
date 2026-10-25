@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { useAuth } from "../hooks/useAuth";
 import { LuLoader } from "react-icons/lu";
-import FormField from "./FormField.jsx";
+import FormField from "./FormField";
+import { useAuth } from "../hooks/useAuth";
 
 const RegisterForm = ({ onSuccess }) => {
   const [showPassword, setShowPassword] = useState(false);

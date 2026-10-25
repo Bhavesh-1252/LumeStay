@@ -1,7 +1,8 @@
 import express from "express"
 
 import authControllers from "../controllers/auth.controller.js";
-import { forgotPasswordLimiter, otpCheckerLimiter, validateForgotPassword, validateLogin, validateRegisteration, validateVerification, validateVerifyResetOtp } from "../middleware.js";
+import {validateForgotPassword, validateLogin, validateRegisteration, validateResetPassword, validateVerification, validateVerifyResetOtp } from "../middlewares/auth.middleware.js";
+import { forgotPasswordLimiter, otpCheckerLimiter } from "../middlewares/middleware.js";
 
 const authRouter = express.Router();
 
@@ -22,5 +23,7 @@ authRouter.get("/get-me", authControllers.getMe)
 authRouter.post("/forgot-password", forgotPasswordLimiter, validateForgotPassword, authControllers.forgotPassword);
 
 authRouter.post("/verify-reset-code", otpCheckerLimiter, validateVerifyResetOtp, authControllers.verifyResetOtp);
+
+authRouter.post("/reset-password", otpCheckerLimiter, validateResetPassword, authControllers.resetPassword);
 
 export default authRouter;

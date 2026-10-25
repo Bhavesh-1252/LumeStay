@@ -1,5 +1,5 @@
 import express from "express"
-import { isLoggedIn, isReviewAuthor, validateReview } from "../middleware.js";
+import { isLoggedIn, isReviewAuthor, validateReview } from "../middlewares/middleware.js";
 import { createReview, destroyReview } from "../controllers/reviews.controller.js";
 import { wrapAsync } from "../utils/wrapAsync.js";
 

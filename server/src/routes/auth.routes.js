@@ -2,7 +2,7 @@ import express from "express"
 
 import authControllers from "../controllers/auth.controller.js";
 import {validateForgotPassword, validateLogin, validateRegisteration, validateResetPassword, validateVerification, validateVerifyResetOtp } from "../middlewares/auth.middleware.js";
-import { forgotPasswordLimiter, otpCheckerLimiter } from "../middlewares/middleware.js";
+import { forgotPasswordLimiter, otpCheckerLimiter } from "../middlewares/auth.middleware.js";
 
 const authRouter = express.Router();
 

@@ -9,7 +9,7 @@ function OtpForm({ email, onBack, onVerify, onResend, title, submitLabel }) {
   const inputsRef = useRef([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [coolDown, setCoolDown] = useState(RESEND_SECONDS);
+  const [coolDown, setCoolDown] = useState(null);
 
   const focusAt = (i) => inputsRef.current[i]?.focus();
 
@@ -76,11 +76,13 @@ function OtpForm({ email, onBack, onVerify, onResend, title, submitLabel }) {
     setLoading(true);
     setError("");
     try {
-      const response = await onVerify(email, code);
+      const response = await onVerify(code);
       if (!response.success) {
         setError(response.message);
+        return;
       }
     } catch (error) {
+      console.log(error);
       setError(error.message);
     } finally {
       setLoading(false);
@@ -93,7 +95,7 @@ function OtpForm({ email, onBack, onVerify, onResend, title, submitLabel }) {
     setDigits(Array(LENGTH).fill(""));
     focusAt(0);
     try {
-      const response = await onResend();
+      const response = await onResend(email);
       if (response && !response.success) {
         setError(response.message);
         return;
@@ -140,7 +142,7 @@ function OtpForm({ email, onBack, onVerify, onResend, title, submitLabel }) {
             role="alert"
             className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
           >
-            {error}
+            {/* {error} */}
           </div>
         )}
 
@@ -166,7 +168,7 @@ function OtpForm({ email, onBack, onVerify, onResend, title, submitLabel }) {
           type="button"
           onClick={handleResend}
           disabled={coolDown > 0}
-          className="cursor-pointer font-semibold text-[#FF385C] hover:underline"
+          className={`font-semibold ${coolDown> 0 ? "text-gray-600" : "cursor-pointer text-[#FF385C] hover:underline"}`}
         >
           {" "}
           {coolDown > 0 ? `Resend in ${coolDown}s` : "Resend"}
@@ -175,14 +177,12 @@ function OtpForm({ email, onBack, onVerify, onResend, title, submitLabel }) {
 
       {/* Back */}
       <p className="mt-2 text-center text-sm text-gray-600">
-        Wrong email?
+        Wrong email?{" "}
         <button
           onClick={onBack}
           type="button"
           className="cursor-pointer font-semibold text-[#FF385C] hover:underline"
-        >
-          {" "}
-          Go back
+        > Go back
         </button>
       </p>
     </div>

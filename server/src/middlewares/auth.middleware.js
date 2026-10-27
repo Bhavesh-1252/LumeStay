@@ -1,4 +1,31 @@
 import authValidators from "../validators/auth.validator.js";
+import rateLimit from "express-rate-limit"
+
+
+const createLimiter = ({ minutes, limit, message }) => rateLimit({
+  windowMs: minutes * 60 * 1000,
+  limit,
+  legacyHeaders: false,
+  standardHeaders: true,
+  handler: (req, res) => res.status(429).json({
+    success: false,
+    code: "RATE_LIMITED",
+    message
+  })
+})
+
+export const forgotPasswordLimiter = createLimiter({
+  minutes: 15,
+  limit: 8,
+  message: "Too many requests. Please try again in few minutes!"
+})
+
+export const otpCheckerLimiter = createLimiter({
+  minutes: 15,
+  limit: 10,
+  message: "Too many attempts. Please try again later!"
+})
+
 
 export const validateRegisteration = (req, res, next) => {
   const { error, value } = authValidators.registerSchema.validate(req.body, {

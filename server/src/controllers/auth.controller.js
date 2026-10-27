@@ -107,7 +107,7 @@ const verifyUserController = async (req, res) => {
     const user = await UserModel.findByIdAndUpdate(
       otpDoc.userId,
       { verified: true },
-      { new: true },
+      { returnDocument: "after" },
     );
 
     await OtpModel.deleteMany({
@@ -513,7 +513,7 @@ const verifyOtp = async (userId, otp) => {
   const updatedOtpDoc = await OtpModel.findOneAndUpdate(
     { _id: otpDoc._id, attempts: { $lt: MAX_ATTEMPTS } },
     { $inc: { attempts: 1 } },
-    { returnDocument: "after" },
+    { returnDocument: 'after' },
   );
 
   if (!updatedOtpDoc) {

@@ -20,18 +20,18 @@ const emailSchema = Joi.string()
   .messages({
     "string.empty": "{#label} is required",
     "string.email": "Enter a valid email address",
-    "string.max": "{#label} must be at least {#limit} characters",
+    "string.max": "{#label} must be at most {#limit} characters",
     "any.required": "{#label} is required",
   });
 
 const otpSchema = Joi.string().trim().min(6).max(6).required().messages({
   "string.empty": "{#label} is required",
   "string.min": "{#label} must be at least {#limit} characters",
-  "string.max": "{#label} must be at least {#limit} characters",
+  "string.max": "{#label} must be at most {#limit} characters",
   "any.required": "{#label} is required",
 });
 
-const passwordSchema = Joi.string().min(8).max(30).required().messages({
+const passwordSchema = Joi.string().trim().min(8).max(30).required().messages({
   "string.empty": "{#label} is required",
   "string.min": "{#label} must be at least {#limit} characters",
   "string.max": "{#label} must be at most {#limit} characters",

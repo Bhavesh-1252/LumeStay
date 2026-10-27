@@ -2,32 +2,7 @@ import Listing from "../models/listing.model.js";
 import Review from "../models/review.model.js";
 import { listingSchema, reviewSchema } from "../validators/listing.validator.js";
 import ExpressError from "../utils/expressError.js";
-import rateLimit from "express-rate-limit"
 
-
-const createLimiter = ({ minutes, limit, message }) => rateLimit({
-    windowMs: minutes * 60 * 1000,
-    limit,
-    legacyHeaders: false,
-    standardHeaders: true,
-    handler: (req, res) => res.status(429).json({
-        success: false,
-        code: "RATE_LIMITED",
-        message
-    })
-})
-
-export const forgotPasswordLimiter = createLimiter({
-    minutes: 15,
-    limit: 5,
-    message: "Too many requests. Please try again in few minutes!"
-})
-
-export const otpCheckerLimiter = createLimiter({
-    minutes: 1,
-    limit: 10,
-    message: "Too many attempts. Please try again later!"
-})
 
 
 export const guestOnly = (req, res, next) => {

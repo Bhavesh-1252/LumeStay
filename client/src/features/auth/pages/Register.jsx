@@ -6,7 +6,7 @@ import useFlashMessage from "../../../hooks/useFlashMessage";
 import { useNavigate } from "react-router";
 
 const Register = () => {
-  const [step, setStep] = useState(2);
+  const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
 
   const { handleVerifyEmail } = useAuth();

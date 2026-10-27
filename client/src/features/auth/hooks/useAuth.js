@@ -78,7 +78,7 @@ export const useAuth = () => {
     }
   };
 
-  const handleForgotPassword = async (email) => {
+  const handleForgotPasswordAndResend = async (email) => {
     try {
       const data = await forgotPassword(email);
       return { success: true, message: data.message };
@@ -110,6 +110,7 @@ export const useAuth = () => {
 
   const handleResetPassword = async (email, otp, newPassword) => {
     try {
+      console.log(newPassword);
       const data = await resetPassword(email, otp, newPassword);
       return { success: true, message: data.message };
     } catch (error) {
@@ -149,7 +150,7 @@ export const useAuth = () => {
     handleVerifyEmail,
     handleLogin,
     handleLogout,
-    handleForgotPassword,
+    handleForgotPasswordAndResend,
     handleVerifyOtp,
     handleResetPassword,
   };

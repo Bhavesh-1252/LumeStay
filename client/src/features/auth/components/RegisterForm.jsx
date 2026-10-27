@@ -141,35 +141,6 @@ const RegisterForm = ({ onSuccess }) => {
         />
 
         {/* Password */}
-        {/* <div>
-          <label
-            htmlFor="password"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Password
-          </label>
-          <div className="relative">
-            <input
-              id="password"
-              type={showPassword ? "text" : "password"}
-              onChange={(e) => setPassword(e.target.value)}
-              name="password"
-              value={password}
-              placeholder="Create a password"
-              className="w-full rounded-xl border border-gray-300 px-4 py-3 pr-20 text-sm outline-none transition focus:border-[#FF385C] focus:ring-2 focus:ring-[#FF385C]/20"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="cursor-pointer absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-500 hover:text-gray-800"
-            >
-              {showPassword ? "Hide" : "Show"}
-            </button>
-          </div>
-          <p className="mt-2 text-xs text-gray-400">
-            Use at least 8 characters.
-          </p>
-          </div> */}
 
         <FormField
           id="password"

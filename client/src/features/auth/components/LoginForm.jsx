@@ -156,27 +156,38 @@ const LoginForm = () => {
                 </button>
               </div>
             </div> */}
-            <FormField
-              id="password"
-              label="Password"
-              error={errors.password}
-              type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                clearError("password");
-              }}
-              placeholder="Enter your password"
-              rightSlot={
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="cursor-pointer absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-500 hover:text-gray-800"
+            <div>
+              <FormField
+                id="password"
+                label="Password"
+                error={errors.password}
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  clearError("password");
+                }}
+                placeholder="Enter your password"
+                rightSlot={
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="cursor-pointer absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-500 hover:text-gray-800"
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
+                }
+              />
+              <div className="mt-2 text-right">
+                <Link
+                  to="/forgot-password"
+                  className="text-sm font-medium text-[#FF385C] hover:underline"
                 >
-                  {showPassword ? "Hide" : "Show"}
-                </button>
-              }
-            />
+                  Forgot password?
+                </Link>
+              </div>
+            </div>
+
             {/* Login Button */}
             <button
               type="submit"

@@ -79,7 +79,7 @@ export async function resetPassword(email, otp, newPassword) {
     const response = await api.post("/api/auth/reset-password", {
         email,
         otp,
-        newPassword
+        password:newPassword
     });
     return response.data;
 }

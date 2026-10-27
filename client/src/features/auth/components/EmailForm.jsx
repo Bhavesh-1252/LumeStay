@@ -4,13 +4,13 @@ import { Link } from "react-router";
 import FormField from "./FormField";
 import { useAuth } from "../hooks/useAuth";
 
-const EmailForm = ({onDone}) => {
+const EmailForm = ({ onDone }) => {
   const [email, setEmail] = useState("");
   const [formError, setFormError] = useState("");
   const [loading, setLoading] = useState(false);
   const [emailError, setEmailError] = useState("");
 
-  const {handleForgotPassword} = useAuth();
+  const { handleForgotPasswordAndResend } = useAuth();
 
   const validate = () => {
     let e = "";
@@ -21,24 +21,24 @@ const EmailForm = ({onDone}) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const fieldError = validate();
-    if(fieldError) {
-        setEmailError(fieldError);
-        return;
+    if (fieldError) {
+      setEmailError(fieldError);
+      return;
     }
 
     setFormError("");
     setLoading(true);
     try {
-        const response = await handleForgotPassword(email);
-        if(!response.success) {
-            setFormError(response.message);
-            return;
-        }
-        onDone(email.trim());
+      const response = await handleForgotPasswordAndResend(email);
+      if (!response.success) {
+        setFormError(response.message);
+        return;
+      }
+      onDone(email.trim());
     } catch (error) {
-        setFormError(error.message);
-    }finally{
-        setLoading(false);
+      setFormError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -65,7 +65,7 @@ const EmailForm = ({onDone}) => {
           type="email"
           label="Email"
           value={email}
-            error={emailError}
+          error={emailError}
           placeholder="Enter your email"
           onChange={(e) => {
             setEmail(e.target.value);

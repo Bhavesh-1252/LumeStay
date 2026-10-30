@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
-import { useAuth } from "../../features/auth/hooks/useAuth";
-import useFlashMessage from "../../hooks/useFlashMessage";
 import { useState } from "react";
+import { useAuth } from "../../auth/hooks/useAuth";
+import useFlashMessage from "../../../hooks/useFlashMessage";
 
 const Listings = () => {
   const [loading, setLoading] = useState("");

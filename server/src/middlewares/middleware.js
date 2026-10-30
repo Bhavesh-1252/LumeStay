@@ -3,8 +3,6 @@ import Review from "../models/review.model.js";
 import { listingSchema, reviewSchema } from "../validators/listing.validator.js";
 import ExpressError from "../utils/expressError.js";
 
-
-
 export const guestOnly = (req, res, next) => {
     if (req.isAuthenticated()) {
         return res.status(403).json({

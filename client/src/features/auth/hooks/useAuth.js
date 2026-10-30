@@ -8,6 +8,7 @@ import {
   forgotPassword,
   verifyOtp,
   resetPassword,
+  resendVerificationOtp,
 } from "../services/auth.api";
 
 export const useAuth = () => {
@@ -58,6 +59,21 @@ export const useAuth = () => {
           error.response?.data?.message ||
           error.message ||
           "Error in email verification!",
+      };
+    }
+  };
+
+  const handleResendVerificationOtp = async (email) => {
+    try {
+      const data = await resendVerificationOtp(email);
+      return { success: true, message: data.message };
+    } catch (error) {
+      return {
+        success: false,
+        message:
+          error.response?.data?.message ||
+          error.message ||
+          "Error in resending verification OTP",
       };
     }
   };
@@ -148,6 +164,7 @@ export const useAuth = () => {
     user,
     handleRegister,
     handleVerifyEmail,
+    handleResendVerificationOtp,
     handleLogin,
     handleLogout,
     handleForgotPasswordAndResend,

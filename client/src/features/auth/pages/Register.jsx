@@ -9,7 +9,7 @@ const Register = () => {
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
 
-  const { handleVerifyEmail } = useAuth();
+  const { handleVerifyEmail, handleResendVerificationOtp } = useAuth();
   const { showFlash } = useFlashMessage();
   const navigate = useNavigate();
 
@@ -27,6 +27,11 @@ const Register = () => {
     }
     return response;
   };
+
+  const onResend = async (userEmail) => {
+    const response = await handleResendVerificationOtp(userEmail);
+    return response;
+  }
 
   return (
     <div className="min-h-full bg-gray-50 flex items-center justify-center px-4 py-8">
@@ -49,6 +54,7 @@ const Register = () => {
             onVerify={onVerify}
             submitLabel={"Verify Email"}
             title={"Verify your email"}
+            onResend={onResend}
           />
         )}
       </div>

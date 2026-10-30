@@ -26,6 +26,11 @@ export async function verifyEmail(email, otp) {
   return response.data;
 }
 
+export async function resendVerificationOtp(email) {
+  const response = await api.post("/api/auth/resend-verification-otp", { email });
+  return response.data;
+}
+
 export async function login(identifier, password) {
   const response = await api.post(`/api/auth/login`, {
     identifier,
@@ -66,20 +71,20 @@ export async function getMe(accessToken) {
 }
 
 export async function forgotPassword(email) {
-    const response = await api.post("/api/auth/forgot-password", {email});
-    return response.data;
+  const response = await api.post("/api/auth/forgot-password", { email });
+  return response.data;
 }
 
 export async function verifyOtp(email, otp) {
-    const response = await api.post("/api/auth/verify-reset-code", {email, otp});
-    return response.data;
+  const response = await api.post("/api/auth/verify-reset-code", { email, otp });
+  return response.data;
 }
 
 export async function resetPassword(email, otp, newPassword) {
-    const response = await api.post("/api/auth/reset-password", {
-        email,
-        otp,
-        password:newPassword
-    });
-    return response.data;
+  const response = await api.post("/api/auth/reset-password", {
+    email,
+    otp,
+    password: newPassword
+  });
+  return response.data;
 }

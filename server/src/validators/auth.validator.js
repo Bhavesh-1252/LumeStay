@@ -38,18 +38,22 @@ const passwordSchema = Joi.string().trim().min(8).max(30).required().messages({
   "any.required": "{#label} is required",
 });
 
-export const registerSchema = Joi.object({
+const registerSchema = Joi.object({
   username: usernameSchema,
   email: emailSchema,
   password: passwordSchema,
 });
 
-export const verificationSchema = Joi.object({
+const verificationSchema = Joi.object({
   otp: otpSchema,
   email: emailSchema,
 });
 
-export const loginSchema = Joi.object({
+const resendVerificationOtpSchema = Joi.object({
+  email: emailSchema
+})
+
+const loginSchema = Joi.object({
   identifier: Joi.alternatives()
     .try(usernameSchema, emailSchema)
     .required()
@@ -62,28 +66,29 @@ export const loginSchema = Joi.object({
   password: passwordSchema,
 });
 
-export const forgotPasswordSchema = Joi.object({
+const forgotPasswordSchema = Joi.object({
   email: emailSchema,
 });
 
-export const verifyOtpSchema = Joi.object({
+const verifyOtpSchema = Joi.object({
   email: emailSchema,
   otp: otpSchema,
 });
 
-export const resetPasswordSchema = Joi.object({
+const resetPasswordSchema = Joi.object({
   email: emailSchema,
   otp: otpSchema,
   password: passwordSchema,
 });
 
-const authValidators = {
+const authValidatorsSchema = {
   registerSchema,
   verificationSchema,
+  resendVerificationOtpSchema,
   loginSchema,
   forgotPasswordSchema,
   verifyOtpSchema,
   resetPasswordSchema,
 };
 
-export default authValidators;
+export default authValidatorsSchema;

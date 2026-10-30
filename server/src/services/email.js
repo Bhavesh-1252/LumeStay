@@ -8,7 +8,7 @@ const brevo = new BrevoClient({ apiKey: config.BREVO_API_KEY });
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export async function sendRegistrationEmail(toEmail, otp) {
+export async function sendUserVerificationEmail(toEmail, otp) {
 
     const html = await ejs.renderFile(path.join(__dirname, "..", "views/templates/userVerificationEmail.ejs"), { otp })
 

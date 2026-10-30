@@ -7,7 +7,7 @@ import OtpModel from "../models/otp.model.js";
 import SessionModel from "../models/session.model.js";
 import {
   sendPasswordResetEmail,
-  sendRegistrationEmail,
+  sendUserVerificationEmail,
 } from "../services/email.js";
 
 /**
@@ -54,7 +54,7 @@ const registerUserController = async (req, res) => {
       purpose: "email-verification",
     });
 
-    const err = await sendRegistrationEmail(email, otp);
+    const err = await sendUserVerificationEmail(email, otp);
 
     if (err) {
       return res.status(500).json({
@@ -131,6 +131,72 @@ const verifyUserController = async (req, res) => {
     });
   }
 };
+
+/**
+ * @name resendVerificationOtp
+ * @description resend otp for account verification after registeration, require email 
+ * @access Public
+ */
+const resendVerificationOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await UserModel.findOne({ email });
+    if (!user || user.verified) {
+      // same response for both unknown and registered emails, to avoid showing user existence
+      return res.status(200).json({
+        success: true,
+        message: "If the account needs verification, a new code has been sent.",
+      });
+    }
+
+    const otpDoc = await OtpModel.findOne({
+      userId: user._id,
+      purpose: "email-verification",
+    });
+
+    if (otpDoc && otpDoc.createdAt.getTime() + 60000 > Date.now()) {
+      // if OTP is generate before 1 minute don't generate a another.
+      return res.status(200).json({
+        success: true,
+        message: "Please wait a minute before requesting a new code.",
+      });
+    }
+
+    if (otpDoc)
+      await OtpModel.deleteOne({ _id: otpDoc._id });
+
+    const otp = crypto.randomInt(100000, 1000000).toString();
+    const hashedOtp = crypto.createHash("sha256").update(otp).digest("hex");
+    await OtpModel.create({
+      userId: user._id,
+      otpHash: hashedOtp,
+      email: user.email,
+      purpose: "email-verification",
+    });
+
+    const error = await sendUserVerificationEmail(user.email, otp);
+    if (error) {
+      return res.status(200).json({
+        success: true,
+        message: "If the account needs verification, a new code has been sent.",
+      });
+    }
+
+    console.log("email send")
+
+    res.status(200).json({
+      success: true,
+      message: "If the account needs verification, a new code has been sent.",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong, please try again later!",
+    });
+  }
+}
 
 /**
  * @name loginUserController
@@ -644,6 +710,7 @@ const resetPassword = async (req, res) => {
 export default {
   registerUserController,
   verifyUserController,
+  resendVerificationOtp,
   loginUserController,
   logoutUserController,
   logoutAllUserController,

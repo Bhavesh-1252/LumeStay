@@ -1,123 +1,189 @@
-import { Link, useNavigate } from "react-router"
-import { FaRegCompass, } from "react-icons/fa6";
+import { Link, useNavigate } from "react-router";
+import { FaRegCompass } from "react-icons/fa6";
 import { FaRegUserCircle } from "react-icons/fa";
-import { IoMenu, IoSearch } from "react-icons/io5";
-import { useState } from "react";
+import { IoSearch } from "react-icons/io5";
+import { useEffect, useRef, useState } from "react";
 import useFlashMessage from "../../../../hooks/useFlashMessage";
 import { useAuth } from "../../../auth/hooks/useAuth";
 
-const Navbar = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [loading, setLoading] = useState(false);
+const SearchBar = ({ className = " " }) => {
+  const [query, setQuery] = useState("");
+  const navigate = useNavigate();
 
-    const { handleLogout } = useAuth();
-    const { showFlash } = useFlashMessage();
-    const navigate = useNavigate();
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const trimmed = query.trim();
+    if (!trimmed) return;
 
-    const logout = async () => {
-        setLoading(true);
-        try {
-            const response = await handleLogout();
-            showFlash(
-                response.success ? response.message : "Logged out from this device",
-                response.success ? "success" : "info",
-            );
-        } finally {
-            setLoading(false);
-            navigate("/login", { replace: true });
-        }
+    navigate(`/listings?search=${encodeURIComponent(trimmed)}`);
+  };
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className={`flex items-center gap-2 ${className}`}
+    >
+      <input
+        type="text"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Find destinations"
+        className="w-full rounded-full border border-gray-300 px-4 py-3 text-sm outline-none transition-all focus:border-[#FF385C] focus:ring-4 focus:ring-[#FF385C]/20"
+      />
+
+      <button
+        type="submit"
+        className="flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-[#fe424d] p-3 text-white transition hover:brightness-95"
+      >
+        <IoSearch className="w-5 h-5" />
+      </button>
+    </form>
+  );
+};
+
+const menuItemClass =
+  "block w-full cursor-pointer px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-black disabled:cursor-not-allowed disabled:opacity-60";
+
+const UserMenu = ({ isLoggedIn, onHost, onLogout, loggingOut }) => {
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const handleClick = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setOpen(false);
+      }
     };
 
-    const hostListing = () => {
-        if (!isLoggedIn) {
-            navigate("/login");
-        } else {
-            navigate("/listings/new");
-        }
+    const handleKey = (e) => {
+      if (e.key == "Escape") setOpen(false);
+    };
+
+    document.addEventListener("mousedown", handleClick);
+    document.addEventListener("keydown", handleKey);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [open]);
+
+  const onclose = () => setOpen(false);
+
+  return (
+    <div ref={menuRef} className="relative">
+      <button
+        type="button"
+        className="cursor-pointer rounded-full bg-gray-200 p-2 text-gray-700 hover:text-black"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        <FaRegUserCircle className="w-5 h-5" />
+      </button>
+
+      {open && (
+        <div className="absolute right-0 mt-2 w-48 overflow-hidden rounded-xl border border-gray-200 bg-white py-2 shadow-lg">
+          {isLoggedIn ? (
+            <>
+              <button
+                className={`${menuItemClass} sm:hidden`}
+                onClick={() => {
+                  onclose();
+                  onHost();
+                }}
+              >
+                Host Listing
+              </button>
+              <button
+                disabled={loggingOut}
+                onClick={() => {
+                  onclose();
+                  onLogout();
+                }}
+                className={menuItemClass}
+              >
+                {loggingOut ? "Logging out..." : "Log out"}
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" onClick={onclose} className={menuItemClass}>
+                Log in
+              </Link>
+              <Link to="/register" onClick={onclose} className={menuItemClass}>
+                Sign up
+              </Link>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const Navbar = () => {
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  const { user, handleLogout } = useAuth();
+  const isLoggedIn = Boolean(true);
+
+  const { showFlash } = useFlashMessage();
+  const navigate = useNavigate();
+
+  const handleHostListing = () => {
+    navigate(isLoggedIn ? "/listings/new" : "/login");
+  };
+
+  const logout = async () => {
+    setLoggingOut(true);
+    try {
+      const response = await handleLogout();
+      showFlash(
+        response.success ? response.message : "Logged out from this device",
+        response.success ? "success" : "info",
+      );
+    } finally {
+      setLoggingOut(false);
+      navigate("/login", { replace: true });
     }
+  };
 
-    const userProfile = () => {
-        if(!isLoggedIn) {
-            navigate("/login");
-            return;
-        }
+  return (
+    <nav className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white lg:px-18">
+      <div className="mx-5 py-4">
+        {/* Logo */}
+        <div className="flex items-center gap-5">
+          <Link to="/" className="text-2xl font-bold text-[#FF385C] flex gap-3">
+            <FaRegCompass className="w-8 h-8" />
+            LumeStay
+          </Link>
 
+          {/* Desktop search */}
+          <SearchBar className="mx-auto hidden w-full max-w-xl md:flex" />
 
-    }
+          <div className="ml-auto flex items-center gap-3 md:ml-0">
+            <button
+              onClick={handleHostListing}
+              className="hidden cursor-pointer whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-200 hover:text-black sm:block"
+            >
+              Host listing
+            </button>
 
-    // const
+            <UserMenu
+              isLoggedIn={isLoggedIn}
+              loggingOut={loggingOut}
+              onHost={handleHostListing}
+              onLogout={logout}
+            />
+          </div>
+        </div>
 
-    return (
-        <nav className="sticky top-0 z-50 w-full lg:px-18 border-b border-gray-200 bg-white">
-            <div className="mx-5 flex py-5 items-center">
-
-
-                {/* Navbar Content */}
-                <div
-                    id="navbar-content"
-                    className=" w-full items-center flex gap-5"
-                >
-
-                    {/* Explore */}
-                    <div className="flex items-center">
-                        <Link
-                            to="/"
-                            className="text-2xl font-bold text-[#FF385C] flex gap-3"
-                        >
-                            <FaRegCompass className="w-8 h-8" />
-                            LumeStay
-                        </Link>
-                    </div>
-
-                    <button
-                        className="ml-auto rounded-md text-gray-600 md:hidden"
-                        type="button"
-                    >
-                        <IoMenu className="w-5 h-5" />
-                    </button>
-
-                    {/* Search */}
-                    <form className="mx-auto flex sm:w-1/2 items-center">
-
-                        <input
-                            type="text"
-                            placeholder="Find destinations"
-                            className="mr-2 w-full rounded-full border border-gray-300 px-4 py-3 text-sm outline-none focus:ring-4 transition-all focus:ring-blue-300/65 hidden sm:block"
-                        />
-
-                        <button
-                            type="submit"
-                            className="flex shrink-0 items-center justify-center rounded-full bg-[#fe424d] p-3 text-white transition hover:bg-[#fe424d]"
-                        >
-                            <IoSearch className="w-5 h-5" />
-                        </button>
-                    </form>
-
-                    {/* Authentication Links */}
-                    <div className="flex items-center gap-5 md:ml-auto">
-
-                        <button
-                            onClick={hostListing}
-                            className="whitespace-nowrap cursor-pointer px-3 py-2 text-base text-gray-700 hover:text-black"
-                        >
-                            Host listing
-                        </button>
-
-
-                        <button onClick={userProfile} className="p-2 bg-gray-200 rounded-full cursor-pointer">
-                            <FaRegUserCircle className="w-5 h-5" />
-                        </button>
-                        <button
-                            onClick={logout}
-                            className="px-3 py-2 text-gray-700 hover:text-black"
-                        >
-                            Logout
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </nav>
-    );
+        {/* Mobile search (second row) */}
+        <SearchBar className="mt-4 md:hidden" />
+      </div>
+    </nav>
+  );
 };
 
 export default Navbar;

@@ -8,22 +8,19 @@ const objectIdValidation = (value, helper) => {
   return value;
 };
 
-export const getListingSchema = Joi.object({
-    id: Joi.string().custom(objectIdValidation).required(),
+const getListingSchema = Joi.object({
+  id: Joi.string().custom(objectIdValidation).required(),
 });
 
-export const listingSchema = Joi.object({
-  listing: Joi.object({
-    title: Joi.string().required(),
-    description: Joi.string().required(),
-    location: Joi.string().required(),
-    price: Joi.number().required().min(0),
-    image: Joi.string().allow("", null),
-    country: Joi.string().required(),
-  }).required(),
+const listingSchema = Joi.object({
+  title: Joi.string().trim().required(),
+  description: Joi.string().trim().required(),
+  location: Joi.string().trim().required(),
+  price: Joi.number().required().min(0),
+  country: Joi.string().trim().required(),
 });
 
-export const reviewSchema = Joi.object({
+const reviewSchema = Joi.object({
   review: Joi.object({
     comment: Joi.string().required(),
     rating: Joi.number().required().min(1).max(5),
@@ -31,9 +28,9 @@ export const reviewSchema = Joi.object({
 });
 
 const listingValidatorsSchema = {
-    getListingSchema,
-    listingSchema,
-    reviewSchema
+  getListingSchema,
+  listingSchema,
+  reviewSchema
 }
 
 export default listingValidatorsSchema;

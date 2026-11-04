@@ -1,6 +1,6 @@
 import Listing from "../models/listing.model.js";
 import Review from "../models/review.model.js";
-import { listingSchema, reviewSchema } from "../validators/listing.validator.js";
+// import { listingSchema, reviewSchema } from "../validators/listing.validator.js";
 import ExpressError from "../utils/expressError.js";
 
 export const guestOnly = (req, res, next) => {

@@ -10,10 +10,20 @@ const listingSchema = new Schema({
     image: {
         url: String,
         filename: String,
+        publicId: String,
     },
-    price: Number,
-    country: String,
-    location: String,
+    price: {
+        type: Number,
+        required: true,
+    },
+    country: {
+        type: String,
+        required: true
+    },
+    location: {
+        type: String,
+        required: true
+    },
     reviews: [
         {
             type: Schema.Types.ObjectId,
@@ -23,18 +33,19 @@ const listingSchema = new Schema({
     owner: {
         type: Schema.Types.ObjectId,
         ref: "User",
+        requied: true
     },
-    geometry: {
-        type: {
-            type: String, // Don't do `{ location: { type: String } }`
-            enum: ['Point'], // 'location.type' must be 'Point'
-            required: true
-        },
-        coordinates: {
-            type: [Number],
-            required: true
-        }
-    }
+    // geometry: {
+    //     type: {
+    //         type: String, // Don't do `{ location: { type: String } }`
+    //         enum: ['Point'], // 'location.type' must be 'Point'
+    //         required: true
+    //     },
+    //     coordinates: {
+    //         type: [Number],
+    //         required: true
+    //     }
+    // }
 });
 
 // Deleting all the dependent Review for that particular listing which is deleted

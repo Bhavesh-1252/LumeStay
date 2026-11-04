@@ -13,7 +13,7 @@ const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: 'lumestay_DEV',
-        allowedFormats: ["png", "jgp", "jpeg"],
+        allowedFormats: ["png", "jgp", "jpeg", "webp"],
     },
 });
 

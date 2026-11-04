@@ -92,10 +92,10 @@ const dbUrl = config.MONGODB_URI;
 // })
 
 // Listings Routes
-app.use('/listings', isLoggedIn, listingRouter);
+app.use('/api/listings', listingRouter);
 
 // Reviews Routes
-app.use('/listings/:id/reviews', isLoggedIn, reviewRouter);
+app.use('/api/listings/:id/reviews', reviewRouter);
 
 // User Routes
 app.use('/api/auth', authRouter);
@@ -106,11 +106,20 @@ app.all("/{*splat}", (req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-    const { statusCode = 500, message = "Something went wrong!" } = err;
-    res.status(statusCode).json({
+    let { statusCode = 500, message = "Something went wrong!" } = err;
+
+    if (err.name === "TokenExpiredError") {
+        statusCode = 401;
+        message = message || "Invalid access Token";
+    }
+
+    if (statusCode === 500) console.log(err);
+    const body = {
         success: false,
         message
-    })
+    }
+    if (err.fields) body.fields = err.fields;
+    res.status(statusCode).json(body)
 })
 
 export default app;

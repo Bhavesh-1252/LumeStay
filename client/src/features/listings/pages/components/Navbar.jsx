@@ -126,7 +126,7 @@ const Navbar = () => {
   const [loggingOut, setLoggingOut] = useState(false);
 
   const { user, handleLogout } = useAuth();
-  const isLoggedIn = Boolean(true);
+  const isLoggedIn = Boolean(user);
 
   const { showFlash } = useFlashMessage();
   const navigate = useNavigate();

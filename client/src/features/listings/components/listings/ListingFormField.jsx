@@ -1,4 +1,4 @@
-const FormField = ({ id, label, error, rightSlot, ...inputProps }) => {
+const ListingFormField = ({ id, label, error, ...inputProps }) => {
     return (
         <div>
             <label
@@ -8,18 +8,16 @@ const FormField = ({ id, label, error, rightSlot, ...inputProps }) => {
                 {label}
             </label>
 
-            <div className="relative">
+            <div>
                 <input
                     id={id}
                     name={id}
-                    className={`w-full rounded-xl border px-4 py-3 text-sm outline-none transition focus:ring-2 ${rightSlot ? "pr-20" : ""
-                        } ${error
+                    className={`w-full rounded-xl border px-4 py-3 text-sm outline-none transition focus:ring-2 ${error
                             ? "border-red-400 focus:border-red-500 focus:ring-red-200"
                             : "border-gray-300 focus:border-[#FF385C] focus:ring-[#FF385C]/20"
                         }`}
                     {...inputProps}
                 />
-                {rightSlot}
             </div>
 
             {error &&
@@ -30,4 +28,4 @@ const FormField = ({ id, label, error, rightSlot, ...inputProps }) => {
     );
 }
 
-export default FormField;
+export default ListingFormField;

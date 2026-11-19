@@ -1,34 +1,53 @@
-import { useNavigate } from "react-router";
-import { useState } from "react";
-import { useAuth } from "../../auth/hooks/useAuth";
-import useFlashMessage from "../../../hooks/useFlashMessage";
+import { useEffect, useState } from "react";
+import useListings from "../hooks/useListings";
+import { BiLoader } from "react-icons/bi";
+import ListingsContainer from "../components/listings/ListingsContainer"
 
-const Listings = () => {
-  const [loading, setLoading] = useState("");
 
-  const { handleLogout } = useAuth();
-  const { showFlash } = useFlashMessage();
-  const navigate = useNavigate();
+const Explore = () => {
+  const [loading, setLoading] = useState(false);
+  const [listings, setListings] = useState([]);
+  const [error, setError] = useState(null);
 
-  const logout = async () => {
+  const { handleGetAllListings } = useListings();
+
+  const fetchAllListings = async () => {
     setLoading(true);
     try {
-      const response = await handleLogout();
-      showFlash(
-        response.success ? response.message : "Logged out from this device",
-        response.success ? "success" : "info",
-      );
+      const response = await handleGetAllListings();
+
+      setListings(response.listings);
+    } catch (error) {
+      setError(error.message);
     } finally {
       setLoading(false);
-      navigate("/login", { replace: true });
     }
-  };
+  }
+
+  useEffect(() => {
+    const initialRender = () => { fetchAllListings(); }
+    initialRender();
+  }, [])
+
 
   return (
-    <div>
-      <button onClick={logout}>Logout</button>
+    <div className="flex flex-1 flex-col">
+      {loading ?
+        <div className="flex flex-1 items-center justify-center">
+          <BiLoader className="w-10 h-10 animate-spin" />
+        </div>
+        :
+        <>  {error || !listings.length ?
+          <div className="flex flex-1 items-center justify-center px-6">
+            <p className="text-center text-gray-500">
+              {error ? error : "No listings are available"}
+            </p>
+          </div>
+          : <ListingsContainer listings={listings} />}
+        </>}
     </div>
+
   );
 };
 
-export default Listings;
+export default Explore;

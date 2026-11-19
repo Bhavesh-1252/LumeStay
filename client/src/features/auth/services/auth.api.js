@@ -1,14 +1,7 @@
-import axios from "axios";
-
-// const baseUrl = ;
-
-const api = axios.create({
-  baseURL: "http://localhost:3000",
-  withCredentials: true,
-});
+import client from "../../../services/axios";
 
 export async function register(username, email, password) {
-  const response = await api.post(`/api/auth/register`, {
+  const response = await client.post(`/api/auth/register`, {
     username,
     email,
     password,
@@ -18,7 +11,7 @@ export async function register(username, email, password) {
 }
 
 export async function verifyEmail(email, otp) {
-  const response = await api.post(`/api/auth/verify`, {
+  const response = await client.post(`/api/auth/verify`, {
     email,
     otp,
   });
@@ -27,12 +20,12 @@ export async function verifyEmail(email, otp) {
 }
 
 export async function resendVerificationOtp(email) {
-  const response = await api.post("/api/auth/resend-verification-otp", { email });
+  const response = await client.post("/api/auth/resend-verification-otp", { email });
   return response.data;
 }
 
 export async function login(identifier, password) {
-  const response = await api.post(`/api/auth/login`, {
+  const response = await client.post(`/api/auth/login`, {
     identifier,
     password,
   });
@@ -41,47 +34,33 @@ export async function login(identifier, password) {
 }
 
 export async function logout() {
-  const response = await api.post(`/api/auth/logout`);
+  const response = await client.post(`/api/auth/logout`);
   return response.data;
 }
 
 export async function logoutAll() {
-  try {
-    const response = await api.post(`/api/auth/logout-all`);
+    const response = await client.post(`/api/auth/logout-all`);
 
     return response.data;
-  } catch (error) {
-    console.log(error);
-  }
 }
 
-export async function rotateTokens() {
-  const response = await api.post(`/api/auth/rotate-token`);
-  return response.data;
-}
-
-export async function getMe(accessToken) {
-  const response = await api.get(`/api/auth/get-me`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-
+export async function getMe() {
+  const response = await client.get(`/api/auth/get-me`);
   return response.data;
 }
 
 export async function forgotPassword(email) {
-  const response = await api.post("/api/auth/forgot-password", { email });
+  const response = await client.post("/api/auth/forgot-password", { email });
   return response.data;
 }
 
 export async function verifyOtp(email, otp) {
-  const response = await api.post("/api/auth/verify-reset-code", { email, otp });
+  const response = await client.post("/api/auth/verify-reset-code", { email, otp });
   return response.data;
 }
 
 export async function resetPassword(email, otp, newPassword) {
-  const response = await api.post("/api/auth/reset-password", {
+  const response = await client.post("/api/auth/reset-password", {
     email,
     otp,
     password: newPassword

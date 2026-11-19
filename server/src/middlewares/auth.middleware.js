@@ -39,7 +39,7 @@ export const validate = (schema, source = "body") => (req, res, next) => {
     throw new ExpressError(422, error.details[0].message, fields);
   }
 
-  req.body = value;
+  req[source] = value;
   next();
 }
 
@@ -52,7 +52,7 @@ export const requireAuth = async (req, res, next) => {
 
   const token = req.headers.authorization?.split(" ")[1];
 
-  if (!token) throw new ExpressError(404, "Token not found");
+  if (!token) throw new ExpressError(401, "User is not authorized");
 
   const decoded = jwt.verify(token, config.JWT_SECRET);
 

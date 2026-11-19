@@ -2,7 +2,7 @@ maptilersdk.config.apiKey = mapToken;
 const map = new maptilersdk.Map({
   container: 'map', // container's id or the HTML element to render the map
   style: maptilersdk.MapStyle.BASE,
-  center: list.geometry.coordinates, // starting position [lng, lat]
+  center: list.geometry.coordinates, // starting position 
   zoom: 12, // starting zoom
 });
 

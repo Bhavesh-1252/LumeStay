@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import Review from "./review.model.js";
+import { cloudinary } from "../services/cloudConfig.js";
 
 const listingSchema = new Schema({
     title: {
@@ -8,9 +9,8 @@ const listingSchema = new Schema({
     },
     description: String,
     image: {
-        url: String,
+        path: String,
         filename: String,
-        publicId: String,
     },
     price: {
         type: Number,
@@ -35,22 +35,25 @@ const listingSchema = new Schema({
         ref: "User",
         requied: true
     },
-    // geometry: {
-    //     type: {
-    //         type: String, // Don't do `{ location: { type: String } }`
-    //         enum: ['Point'], // 'location.type' must be 'Point'
-    //         required: true
-    //     },
-    //     coordinates: {
-    //         type: [Number],
-    //         required: true
-    //     }
-    // }
+    geometry: {
+        type: {
+            type: String, // Don't do `{ location: { type: String } }`
+            enum: ['Point'], // 'location.type' must be 'Point'
+            required: true
+        },
+        coordinates: { // [lng, lat]
+            type: [Number],
+            required: true
+        }
+    }
 });
 
-// Deleting all the dependent Review for that particular listing which is deleted
+// Deleting all the dependent reviews and image for that particular listing which is deleted
 listingSchema.post("findOneAndDelete", async (listing) => {
-    if (listing.reviews.length) {
+    if(listing?.image?.filename) {
+        await cloudinary.uploader.destroy(listing.image.filename);
+    }
+    if (listing?.reviews?.length) {
         await Review.deleteMany({ _id: { $in: listing.reviews } });
     }
 })

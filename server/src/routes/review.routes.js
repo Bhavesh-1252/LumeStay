@@ -1,21 +1,30 @@
 import express from "express"
-import { isLoggedIn, isReviewAuthor, validateReview } from "../middlewares/middleware.js";
-import { createReview, destroyReview } from "../controllers/reviews.controller.js";
-import { wrapAsync } from "../utils/wrapAsync.js";
+import { requireAuth, validate } from "../middlewares/auth.middleware.js";
+import listingValidatorsSchema from "../validators/listing.validator.js";
+import reviewControllers from "../controllers/reviews.controller.js";
+import { authorizeReviewOwner } from "../middlewares/listing.middleware.js";
 
-const router = express.Router({ mergeParams: true });
+const reviewRouter = express.Router({ mergeParams: true });
 // Reviews Routes 
 
-// Create Review
-router.post("/",
-    isLoggedIn,
-    validateReview,
-    wrapAsync(createReview))
+reviewRouter.post("/",
+    requireAuth,
+    validate(listingValidatorsSchema.idSchema, "params"),
+    validate(listingValidatorsSchema.reviewSchema),
+    reviewControllers.createReview);
 
-// Delete
-router.delete("/:reviewId",
-    isLoggedIn,
-    isReviewAuthor,
-    wrapAsync(destroyReview))
+reviewRouter.put("/:reviewId",
+    requireAuth,
+    validate(listingValidatorsSchema.reviewParamsSchema, "params"),
+    authorizeReviewOwner,
+    validate(listingValidatorsSchema.reviewSchema),
+    reviewControllers.editReview);
 
-export default router;
+
+reviewRouter.delete("/:reviewId",
+    requireAuth,
+    validate(listingValidatorsSchema.reviewParamsSchema, "params"),
+    authorizeReviewOwner,
+    reviewControllers.destroyReview);
+
+export default reviewRouter;

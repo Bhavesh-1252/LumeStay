@@ -126,7 +126,6 @@ export const useAuth = () => {
 
   const handleResetPassword = async (email, otp, newPassword) => {
     try {
-      console.log(newPassword);
       const data = await resetPassword(email, otp, newPassword);
       return { success: true, message: data.message };
     } catch (error) {
@@ -139,26 +138,6 @@ export const useAuth = () => {
       };
     }
   };
-
-  // const handleGetme = async () => {
-  //     setLoading(true);
-  //     try {
-  //         const accessToken = localStorage.getItem("accessToken");
-  //         if (!accessToken) {
-  //             setUser(null);
-  //             return;
-  //         }
-
-  //         const data = await getMe(accessToken);
-  //         setUser(data.user);
-
-  //     } catch (error) {
-  //         setUser(null);
-  //         console.log("Failed to get user: ", error.response?.data?.message || error.message);
-  //     } finally {
-  //         setLoading(false);
-  //     }
-  // }
 
   return {
     user,

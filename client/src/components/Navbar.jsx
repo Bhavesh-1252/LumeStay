@@ -3,8 +3,8 @@ import { FaRegCompass } from "react-icons/fa6";
 import { FaRegUserCircle } from "react-icons/fa";
 import { IoSearch } from "react-icons/io5";
 import { useEffect, useRef, useState } from "react";
-import useFlashMessage from "../../../../hooks/useFlashMessage";
-import { useAuth } from "../../../auth/hooks/useAuth";
+import useFlashMessage from "../hooks/useFlashMessage";
+import { useAuth } from "../features/auth/hooks/useAuth";
 
 const SearchBar = ({ className = " " }) => {
   const [query, setQuery] = useState("");
@@ -44,7 +44,7 @@ const SearchBar = ({ className = " " }) => {
 const menuItemClass =
   "block w-full cursor-pointer px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-black disabled:cursor-not-allowed disabled:opacity-60";
 
-const UserMenu = ({ isLoggedIn, onHost, onLogout, loggingOut }) => {
+const UserMenu = ({ isLoggedIn, onHost, onLogout, loggingOut, user }) => {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -86,6 +86,10 @@ const UserMenu = ({ isLoggedIn, onHost, onLogout, loggingOut }) => {
         <div className="absolute right-0 mt-2 w-48 overflow-hidden rounded-xl border border-gray-200 bg-white py-2 shadow-lg">
           {isLoggedIn ? (
             <>
+              <span className={`${menuItemClass} font-bold`}
+              >
+                @{user}
+              </span>
               <button
                 className={`${menuItemClass} sm:hidden`}
                 onClick={() => {
@@ -175,6 +179,7 @@ const Navbar = () => {
               loggingOut={loggingOut}
               onHost={handleHostListing}
               onLogout={logout}
+              user={user?.username}
             />
           </div>
         </div>

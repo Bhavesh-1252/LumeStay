@@ -1,5 +1,5 @@
 import { useState } from "react";
-import FormField from "./FormField";
+import AuthFormField from "./AuthFormField";
 import { LuLoader } from "react-icons/lu";
 import { useAuth } from "../hooks/useAuth";
 import useFlashMessage from "../../../hooks/useFlashMessage";
@@ -52,7 +52,6 @@ const NewPasswordForm = ({ email, otp }) => {
     setFormError("");
     setLoading(true);
     try {
-      console.log(password)
       const response = await handleResetPassword(email, otp, password)
       if (!response.success) {
         setFormError(response.message);
@@ -87,7 +86,7 @@ const NewPasswordForm = ({ email, otp }) => {
       )}
 
       <form onSubmit={handleSubmit} className="mt-5 space-y-5">
-        <FormField
+        <AuthFormField
           id="password"
           label="New password"
           type={showPassword ? "text" : "password"}
@@ -109,7 +108,7 @@ const NewPasswordForm = ({ email, otp }) => {
           }
         />
 
-        <FormField
+        <AuthFormField
           id="confirm"
           label="Confirm password"
           type={showConfirmPassword ? "text" : "password"}

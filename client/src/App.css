@@ -1,0 +1,14 @@
+.maplibregl-popup-close-button {
+    width: 32px;
+    height: 32px;
+    font-size: 24px !important;
+    line-height: 32px !important;
+    padding: 0 !important;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    color: #333;
+}

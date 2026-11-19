@@ -108,7 +108,7 @@ app.all("/{*splat}", (req, res, next) => {
 app.use((err, req, res, next) => {
     let { statusCode = 500, message = "Something went wrong!" } = err;
 
-    if (err.name === "TokenExpiredError") {
+    if (err.name === "TokenExpiredError" || err.name === "JsonWebTokenError") {
         statusCode = 401;
         message = message || "Invalid access Token";
     }

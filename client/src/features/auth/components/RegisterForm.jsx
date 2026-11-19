@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import { LuLoader } from "react-icons/lu";
-import FormField from "./FormField";
+import AuthFormField from "./AuthFormField";
 import { useAuth } from "../hooks/useAuth";
 
 const RegisterForm = ({ onSuccess }) => {
@@ -96,7 +96,7 @@ const RegisterForm = ({ onSuccess }) => {
             className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-[#FF385C] focus:ring-2 focus:ring-[#FF385C]/20"
           />
         </div> */}
-        <FormField
+        <AuthFormField
           id="username"
           label="Username"
           error={errors.username}
@@ -127,7 +127,7 @@ const RegisterForm = ({ onSuccess }) => {
             className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-[#FF385C] focus:ring-2 focus:ring-[#FF385C]/20"
           />
         </div> */}
-        <FormField
+        <AuthFormField
           id="email"
           label="Email"
           error={errors.email}
@@ -142,7 +142,7 @@ const RegisterForm = ({ onSuccess }) => {
 
         {/* Password */}
 
-        <FormField
+        <AuthFormField
           id="password"
           label="Password"
           error={errors.password}

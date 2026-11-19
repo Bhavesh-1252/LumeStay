@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { LuLoader } from "react-icons/lu";
 import { Link } from "react-router";
-import FormField from "./FormField";
+import AuthFormField from "./AuthFormField";
 import { useAuth } from "../hooks/useAuth";
 
 const EmailForm = ({ onDone }) => {
@@ -60,7 +60,7 @@ const EmailForm = ({ onDone }) => {
       )}
 
       <form onSubmit={handleSubmit} className="mt-5 space-y-5">
-        <FormField
+        <AuthFormField
           id="email"
           type="email"
           label="Email"

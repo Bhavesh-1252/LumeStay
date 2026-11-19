@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router";
 import { useAuth } from "../hooks/useAuth";
 import { LuLoader } from "react-icons/lu";
 import useFlashMessage from "../../../hooks/useFlashMessage";
-import FormField from "./FormField";
+import AuthFormField from "./AuthFormField";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -109,7 +109,7 @@ const LoginForm = () => {
                 className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-[#FF385C] focus:ring-2 focus:ring-[#FF385C]/20"
               />
             </div> */}
-            <FormField
+            <AuthFormField
               id="identifier"
               type="text"
               error={errors.identifier}
@@ -157,7 +157,7 @@ const LoginForm = () => {
               </div>
             </div> */}
             <div>
-              <FormField
+              <AuthFormField
                 id="password"
                 label="Password"
                 error={errors.password}

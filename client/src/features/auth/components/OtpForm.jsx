@@ -82,7 +82,6 @@ function OtpForm({ email, onBack, onVerify, onResend, title, submitLabel }) {
         return;
       }
     } catch (error) {
-      console.log(error);
       setError(error.message);
     } finally {
       setLoading(false);

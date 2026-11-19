@@ -1,7 +1,7 @@
 import express from "express"
 
 import authControllers from "../controllers/auth.controller.js";
-import {forgotPasswordLimiter, otpCheckerLimiter, validate } from "../middlewares/auth.middleware.js";
+import {forgotPasswordLimiter, otpCheckerLimiter, requireAuth, validate } from "../middlewares/auth.middleware.js";
 import authValidatorsSchema from "../validators/auth.validator.js";
 
 const authRouter = express.Router();
@@ -20,7 +20,7 @@ authRouter.post("/logout-all", authControllers.logoutAllUserController)
 
 authRouter.post("/rotate-token", authControllers.rotateToken)
 
-authRouter.get("/get-me", authControllers.getMe)
+authRouter.get("/get-me", requireAuth, authControllers.getMe)
 
 authRouter.post("/forgot-password", forgotPasswordLimiter, validate(authValidatorsSchema.forgotPasswordSchema), authControllers.forgotPassword);
 

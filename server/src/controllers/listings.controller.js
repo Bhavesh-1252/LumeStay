@@ -1,102 +1,150 @@
-import mongoose from "mongoose";
-import { geocoding } from "@maptiler/client";
-import { filters } from "../utils/mock.js";
-import Listing from "../models/listing.model.js";
+import config from "../config/config.js";
+import ListingModel from "../models/listing.model.js";
+import { geocoding } from '@maptiler/client';
+import ExpressError from "../utils/expressError.js";
+import { cloudinary } from "../services/cloudConfig.js";
 
-const mapToken = process.env.MAP_TOKEN;
+/**
+ * @name getAllListings
+ * @description fetch all listings from the database
+ * @access Public
+ */
+const getAllListings = async (req, res) => {
+  const listings = await ListingModel.find({}).select("title price image");
+  if (listings.length === 0) {
+    return res.status(200).json({
+      success: true,
+      message: "No listings available"
+    });
+  }
 
-const indexListing = async (req, res) => {
-    const allListings = await Listing.find({});
-    res.render("listings/index.ejs", { allListings, filters });
+  return res.status(200).json({
+    success: true,
+    message: "All listings fetched",
+    listings
+  })
 }
 
-const newListing = (req, res) => {
-    res.render('listings/new.ejs');
-}
-
-const showListing = async (req, res) => {
-    const { id } = req.params;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        req.flash("error", "Invalid Listing Id!");
-        return res.redirect("/listings")
-    }
-
-    const list = await Listing.findById(id)
-        .populate({
-            path: "reviews", populate: {
-                path: "author",
-            }
-        })
-        .populate("owner");
-
-    if (!list) {
-        req.flash("error", "Requested Listing Doesn't Exists!")
-        return res.redirect("/listings");
-    }
-    
-    res.render("listings/show.ejs", { list, mapToken });
-}
-
+/**
+ * @name createListing
+ * @description Create a new listing, require authentication, and expects listing object in req.body
+ * @access Public
+ */
 const createListing = async (req, res) => {
-    const { path, filename } = req.file;
-    const listing = req.body.listing;
-    const response = await geocoding.forward(
-        `${listing.location} ${listing.country}`,
-        { limit: 1, apiKey: mapToken }
-    )
-    const newListing = new Listing(listing);
-    newListing.image = { url: path, filename };
-    newListing.owner = req.user._id;
-    newListing.geometry = response.features[0].geometry;
-    let updatedListing = await newListing.save();
+  const listing = req.body;
+  const { path, filename } = req.file ?? {};
 
-    req.flash("success", "New Listing Created!") // Generating a Flash message
-    res.redirect("/listings");
-}
+  listing.owner = req.user.id;
+  const place = listing.location + "," + listing.country;
+  const result = await geocoding.forward(place, {
+    apiKey: config.MAP_TOKEN,
+    fuzzyMatch: false,
+    limit: 1
+  });
 
-const editListing = async (req, res) => {
-    const { id } = req.params;
-    const list = await Listing.findById(id);
+  if (result.features.length === 0) throw new ExpressError(404, "Location not found");
+  listing.geometry = result.features[0].geometry; // geometry have type & coordinates [lng, lat]
 
-    if (!list) {
-        req.flash("error", "Requested Listing Doesn't Exists!")
-        return res.redirect("/listings");
-    }
-    res.render("listings/edit.ejs", { list });
-}
+  if (path && filename) listing.image = { path, filename };
 
-const updateListing = async (req, res) => {
-    const { id } = req.params;
+  const newListing = await ListingModel.create(listing);
 
-    const listing = await Listing.findByIdAndUpdate(id, { ...req.body.listing })
-    if (typeof req.file !== "undefined") {
-        listing.image = {
-            url: req.file.path,
-            filename: req.file.filename,
-        };
-        await listing.save();
-    }
-
-    req.flash("success", "Listing Updated!") // Generating a Flash message
-    res.redirect(`/listings/${id}`);
-}
-
-const destroyListing = async (req, res) => {
-    const { id } = req.params;
-
-    await Listing.findByIdAndDelete(id);
-    req.flash("success", "Listing Delete!") // Generating a Flash message
-    res.redirect(`/listings`);
-}
-
-export {
-    indexListing,
-    newListing,
-    showListing,
-    createListing,
-    editListing,
-    updateListing,
-    destroyListing
+  res.status(201).json({
+    success: true,
+    message: "Listing created successfully",
+    listingId: newListing._id,
+  });
 };
 
+/**
+ * @name getListing
+ * @description Retrieve a listing, expects listing id in req.params
+ * @access Public
+ */
+const getListing = async (req, res) => {
+  const { id } = req.params;
+
+  const listing = await ListingModel.findById(id).populate("owner", "username").populate({
+    path: "reviews",
+    populate: { path: "author", select: "username" }
+  });
+  if (!listing) {
+    throw new ExpressError(404, "Listing not found");
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Listing fetched successfully",
+    listing
+  })
+}
+
+/**
+ * @name updateListing
+ * @description Update a existing listing, require authentication, and expects listing object in req.body
+ * @access Public
+ */
+const updateListing = async (req, res) => {
+  const listing = req.body;
+  const { path, filename } = req.file ?? {};
+
+  const toUpdate = req.listing;
+
+  if (toUpdate.location !== listing.location || toUpdate.country !== listing.country) {
+
+    const place = listing.location + "," + listing.country;
+    const result = await geocoding.forward(place, {
+      apiKey: config.MAP_TOKEN,
+      fuzzyMatch: false,
+      limit: 1
+    });
+
+    if (result.features.length === 0) throw new ExpressError(404, "Location not found");
+
+    toUpdate.geometry = result.features[0].geometry; // geometry have type & coordinates
+    toUpdate.location = listing.location;
+    toUpdate.country = listing.country;
+  }
+
+  if (path && filename) {
+    if (toUpdate?.image?.filename)
+      await cloudinary.uploader.destroy(toUpdate.image.filename);
+    toUpdate.image = { path, filename };
+  };
+
+  toUpdate.title = listing.title;
+  toUpdate.description = listing.description;
+  toUpdate.price = listing.price;
+
+  await toUpdate.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Listing updated successfully",
+    listingId: toUpdate._id,
+  });
+}
+
+/**
+ * @name destroyListing
+ * @description Deletes a existing listing, require authentication, and expects listing id in req.params
+ * @access Public
+ */
+const destroyListing = async (req, res) => {
+  await ListingModel.findOneAndDelete({ _id: req.listing._id });
+
+  return res.status(200).json({
+    success: true,
+    message: "Listing deleted successfully"
+  });
+}
+
+const listingControllers = {
+  getAllListings,
+  createListing,
+  getListing,
+  updateListing,
+  destroyListing
+};
+
+export default listingControllers;

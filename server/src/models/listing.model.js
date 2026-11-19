@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import Review from "./review.model.js";
+import { cloudinary } from "../services/cloudConfig.js";
 
 const listingSchema = new Schema({
     title: {
@@ -8,12 +9,21 @@ const listingSchema = new Schema({
     },
     description: String,
     image: {
-        url: String,
+        path: String,
         filename: String,
     },
-    price: Number,
-    country: String,
-    location: String,
+    price: {
+        type: Number,
+        required: true,
+    },
+    country: {
+        type: String,
+        required: true
+    },
+    location: {
+        type: String,
+        required: true
+    },
     reviews: [
         {
             type: Schema.Types.ObjectId,
@@ -23,6 +33,7 @@ const listingSchema = new Schema({
     owner: {
         type: Schema.Types.ObjectId,
         ref: "User",
+        requied: true
     },
     geometry: {
         type: {
@@ -30,20 +41,23 @@ const listingSchema = new Schema({
             enum: ['Point'], // 'location.type' must be 'Point'
             required: true
         },
-        coordinates: {
+        coordinates: { // [lng, lat]
             type: [Number],
             required: true
         }
     }
 });
 
-// Deleting all the dependent Review for that particular listing which is deleted
+// Deleting all the dependent reviews and image for that particular listing which is deleted
 listingSchema.post("findOneAndDelete", async (listing) => {
-    if (listing.reviews.length) {
+    if(listing?.image?.filename) {
+        await cloudinary.uploader.destroy(listing.image.filename);
+    }
+    if (listing?.reviews?.length) {
         await Review.deleteMany({ _id: { $in: listing.reviews } });
     }
 })
 
-const Listing = mongoose.model("Listing", listingSchema);
+const ListingModel = mongoose.model("Listing", listingSchema);
 
-export default Listing;
+export default ListingModel;

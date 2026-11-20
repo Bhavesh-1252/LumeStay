@@ -14,36 +14,39 @@ const ReviewEditForm = ({ review, onReviewEdit, setShowEditForm }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (commentError) setCommentError("");
-
         if (!comment.trim()) {
             setCommentError("Comment is required");
             return;
         }
-        else if (comment.trim().length > 150) {
-            setCommentError("Comment cannot exceed 150 characters");
+        else if (comment.trim().length > 200) {
+            setCommentError("Comment cannot exceed 200 characters");
             return;
         }
 
+        if (commentError) setCommentError("");
         setLoading(true);
         try {
             const result = await onReviewEdit({ rating, comment }, review._id);
-            showFlash(result.message, result.success ? "success" : "error");
+            if (!result.success) {
+                showFlash(result.message, "error");
+                return;
+            }
 
+            showFlash(result.message, "success");
+            setComment("");
+            setRating(1);
+            setShowEditForm(false);
         } catch (error) {
             showFlash(error.message);
         }
         finally {
             setLoading(false);
-            setComment("");
-            setRating(1);
-            setShowEditForm(false);
         }
     }
 
     return (
         <form className="space-y-4" onSubmit={handleSubmit}>
-            <p className="font-semibold text-gray-900">{review.author.username}</p>
+            <p className="font-semibold text-gray-900">@{review.author.username}</p>
 
             {/* the same star picker you already built */}
             <ReviewForm
@@ -66,6 +69,7 @@ const ReviewEditForm = ({ review, onReviewEdit, setShowEditForm }) => {
                     Cancel
                 </button>
                 <button
+                    disabled={loading}
                     type="submit"
                     className="cursor-pointer rounded-xl bg-rose-500 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-600 disabled:cursor-not-allowed disabled:opacity-60"
                 >

@@ -22,7 +22,7 @@ const ListingDetails = ({ listing }) => {
     const navigate = useNavigate();
     const { showFlash } = useFlashMessage();
     const { handleDestroyListing } = useListings();
-    const { handleCreateReview, handleEditReview } = useReview();
+    const { handleCreateReview} = useReview();
     const { user } = useAuth();
 
     const deleteThisListing = async () => {
@@ -56,50 +56,40 @@ const ListingDetails = ({ listing }) => {
     const onReviewCreate = async (reviewData) => {
         const response = await handleCreateReview(reviewData, listing._id);
         if (response.success) {
-            setReviews((prev) => [...prev, response.review]);
+            setReviews((prev) => [response.review, ...prev]); // Newest first
         }
 
         return response;
     }
 
-    const onReviewEdit = async (review, reviewId) => {
-        const response = await handleEditReview(review, listing._id, reviewId);
-        if (response.success) {
-            setReviews((prev) => {
-                return prev.map((r) => {
-                    if (r._id === reviewId) {
-                        r.comment = response.review.comment;
-                        r.rating = response.review.rating;
-                    }
-                    return r;
-                })
-            })
-        }
+    // const onReviewEdit = async (review, reviewId) => {
+    //     const response = await handleEditReview(review, listing._id, reviewId);
+    //     if (response.success) {
+    //         setReviews((prev) => {
+    //             return prev.map((r) => {
+    //                 if (r._id === reviewId) {
+    //                     r.comment = response.review.comment;
+    //                     r.rating = response.review.rating;
+    //                 }
+    //                 return r;
+    //             })
+    //         })
+    //     }
 
-        return response;
-    }
+    //     return response;
+    // }
 
 
     return (
         <div className="mx-auto w-full max-w-screen-xl px-6 py-8 lg:px-28">
             {showModal && <ConfirmModal
-                showModal={showModal}
+                heading={"Delete this listing?"}
                 onCancel={() => setShowModal(false)}
                 deleting={deleting}
                 onDelete={() => deleteThisListing()}
             />}
-            {/* Title + location */}
-            {/* <header className="flex justify-between items-center mb-6">
-                <div>
-                    <h1 className="text-2xl font-semibold text-gray-900 sm:text-3xl">{listing.title}</h1>
-                    <p className="mt-1 text-gray-600">{listing.location}, {listing.country}</p>
-                </div>
-                <div className="flex">
-                    <button className="mt-4 w-full rounded-xl bg-rose-500 py-3 font-semibold text-white hover:bg-rose-600">Edit Listing</button>
-                    <button className="mt-4 w-full rounded-xl bg-rose-500 py-3 font-semibold text-white hover:bg-rose-600">Delete</button>
-                </div>
-            </header> */}
 
+            {/* Title + location */}
             <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
                     <h1 className="text-2xl font-semibold text-gray-900 sm:text-3xl">{listing.title}</h1>
@@ -180,7 +170,6 @@ const ListingDetails = ({ listing }) => {
                         :
                         reviews.map((r) => <ReviewCard
                             listingId={listing._id}
-                            onReviewEdit={onReviewEdit}
                             key={r._id}
                             review={r}
                             setReviews={setReviews} />)}

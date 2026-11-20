@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../hooks/useAuth";
-import { LuLoader } from "react-icons/lu";
+import { LuArrowLeft, LuLoader } from "react-icons/lu";
 import useFlashMessage from "../../../hooks/useFlashMessage";
 import AuthFormField from "./AuthFormField";
 
@@ -65,8 +65,16 @@ const LoginForm = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
-        {/* Logo */}
         <div className="text-center mb-8">
+          <Link
+            to="/"
+            className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 sm:left-6 sm:top-6"
+          >
+            <LuArrowLeft className="h-4 w-4" />
+            Back to home
+          </Link>
+
+          {/* Logo */}
           <h1 className="text-3xl sm:text-4xl font-bold text-[#FF385C]">
             Lumestay
           </h1>

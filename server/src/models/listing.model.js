@@ -46,7 +46,7 @@ const listingSchema = new Schema({
             required: true
         }
     }
-});
+}, {timestamps: true});
 
 // Deleting all the dependent reviews and image for that particular listing which is deleted
 listingSchema.post("findOneAndDelete", async (listing) => {

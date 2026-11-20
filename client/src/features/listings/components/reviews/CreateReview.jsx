@@ -14,26 +14,32 @@ const CreateReview = ({ onReviewCreate }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (!comment.trim()) {
+            setCommentError("Comment is required");
+            return;
+        }
+        else if (comment.trim().length > 200) {
+            setCommentError("Comment cannot exceed 200 characters");
+            return;
+        }
+        
         if (commentError) setCommentError("");
-
-        if (!comment.trim()) setCommentError("Comment is required");
-        else if (comment.trim().length > 150) setCommentError("Comment cannot exceed 150 characters");
-
         setLoading(true);
         try {
             const result = await onReviewCreate({ rating, comment });
             if (!result.success) {
-                showFlash(result.message);
+                showFlash(result.message, "error");
                 return;
             }
 
+            setComment("");
+            setRating(1);
+            showFlash(result.message, "success");
         } catch (error) {
-            showFlash(error.message);
+            showFlash(error.message, "error");
         }
         finally {
             setLoading(false);
-            setComment("");
-            setRating(1);
         }
     }
 
@@ -50,7 +56,7 @@ const CreateReview = ({ onReviewCreate }) => {
                     comment={comment}
                     setComment={setComment}
                     commentError={commentError}
-                    label={{review:"Review", comment: "Comment" }}
+                    label={{ review: "Review", comment: "Comment" }}
                 />
 
                 <button

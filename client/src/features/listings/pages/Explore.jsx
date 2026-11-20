@@ -3,7 +3,6 @@ import useListings from "../hooks/useListings";
 import { BiLoader } from "react-icons/bi";
 import ListingsContainer from "../components/listings/ListingsContainer"
 
-
 const Explore = () => {
   const [loading, setLoading] = useState(false);
   const [listings, setListings] = useState([]);
@@ -27,8 +26,7 @@ const Explore = () => {
   useEffect(() => {
     const initialRender = () => { fetchAllListings(); }
     initialRender();
-  }, [])
-
+  }, []);
 
   return (
     <div className="flex flex-1 flex-col">

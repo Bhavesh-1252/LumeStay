@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import RegisterForm from "../components/RegisterForm";
 import OtpForm from "../components/OtpForm";
 import { useAuth } from "../hooks/useAuth";
 import useFlashMessage from "../../../hooks/useFlashMessage";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { LuArrowLeft } from "react-icons/lu";
 
 const Register = () => {
   const [step, setStep] = useState(1);
@@ -12,6 +13,13 @@ const Register = () => {
   const { handleVerifyEmail, handleResendVerificationOtp } = useAuth();
   const { showFlash } = useFlashMessage();
   const navigate = useNavigate();
+
+  const { user } = useAuth()
+
+  useEffect(() => {
+    if (user) navigate("/");
+  })
+
 
   const handleRegistered = (registeredEmail) => {
     setEmail(registeredEmail);
@@ -36,6 +44,14 @@ const Register = () => {
   return (
     <div className="min-h-full bg-gray-50 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
+        <Link
+          to="/"
+          className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 sm:left-6 sm:top-6"
+        >
+          <LuArrowLeft className="h-4 w-4" />
+          Back to home
+        </Link>
+
         {/* Logo */}
         <div className="text-center mb-4">
           <h1 className="text-3xl sm:text-4xl font-bold text-[#FF385C]">

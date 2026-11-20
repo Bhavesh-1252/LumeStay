@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 
 const objectIdValidation = (value, helper) => {
   if (!mongoose.isValidObjectId(value)) {
-    console.log(value);
     return helper.message("Not a valid source");
   }
   return value;

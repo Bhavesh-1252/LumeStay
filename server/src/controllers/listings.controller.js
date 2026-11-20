@@ -10,7 +10,7 @@ import { cloudinary } from "../services/cloudConfig.js";
  * @access Public
  */
 const getAllListings = async (req, res) => {
-  const listings = await ListingModel.find({}).select("title price image");
+  const listings = await ListingModel.find({}, null, { sort: { createdAt: -1 } }).select("title price image");
   if (listings.length === 0) {
     return res.status(200).json({
       success: true,
@@ -66,17 +66,20 @@ const getListing = async (req, res) => {
 
   const listing = await ListingModel.findById(id).populate("owner", "username").populate({
     path: "reviews",
-    populate: { path: "author", select: "username" }
+    populate: { path: "author", select: "username" },
+    options : {
+      sort: {createdAt: -1}
+    }    
   });
-  if (!listing) {
-    throw new ExpressError(404, "Listing not found");
-  }
+if (!listing) {
+  throw new ExpressError(404, "Listing not found");
+}
 
-  res.status(200).json({
-    success: true,
-    message: "Listing fetched successfully",
-    listing
-  })
+res.status(200).json({
+  success: true,
+  message: "Listing fetched successfully",
+  listing
+})
 }
 
 /**

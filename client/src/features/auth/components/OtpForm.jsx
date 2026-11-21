@@ -141,7 +141,7 @@ function OtpForm({ email, onBack, onVerify, onResend, title, submitLabel }) {
             role="alert"
             className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
           >
-            {/* {error} */}
+            {error}
           </div>
         )}
 

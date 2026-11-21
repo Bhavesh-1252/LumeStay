@@ -1,6 +1,6 @@
 import ListingModel from "../models/listing.model.js";
 import ReviewModel from "../models/review.model.js";
-import ExpressError from "../utils/expressError.js";
+import ExpressError from "../services/expressError.js";
 
 export const authorizeListingOwner = async (req, res, next) => {
     const {id} = req.params;

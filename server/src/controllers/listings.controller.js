@@ -1,7 +1,7 @@
 import config from "../config/config.js";
 import ListingModel from "../models/listing.model.js";
 import { geocoding } from '@maptiler/client';
-import ExpressError from "../utils/expressError.js";
+import ExpressError from "../services/expressError.js";
 import { cloudinary } from "../services/cloudConfig.js";
 
 /**

@@ -9,7 +9,7 @@ import {
   sendPasswordResetEmail,
   sendUserVerificationEmail,
 } from "../services/email.js";
-import ExpressError from "../utils/expressError.js";
+import ExpressError from "../services/expressError.js";
 
 /**
  * @name registerUserController

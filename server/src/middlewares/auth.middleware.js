@@ -1,8 +1,8 @@
-import rateLimit from "express-rate-limit"
-import jwt from "jsonwebtoken"
-import config from "../config/config.js"
-import UserModel from "../models/user.model.js"
-import ExpressError from "../utils/expressError.js"
+import rateLimit from "express-rate-limit";
+import jwt from "jsonwebtoken";
+import config from "../config/config.js";
+import UserModel from "../models/user.model.js";
+import ExpressError from "../services/expressError.js";
 
 const createLimiter = ({ minutes, limit, message }) => rateLimit({
   windowMs: minutes * 60 * 1000,
